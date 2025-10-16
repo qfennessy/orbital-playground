@@ -249,13 +249,8 @@
         </div>
 
         <div class="control-group">
-            <label>Velocity <span class="value-display" id="velocityValue">100%</span></label>
-            <input type="range" id="velocitySlider" min="50" max="150" value="100" step="5">
-        </div>
-
-        <div class="control-group">
             <label>Simulation Speed <span class="value-display" id="speedValue">1.0x</span></label>
-            <input type="range" id="speedSlider" min="0.1" max="5" value="1" step="0.1">
+            <input type="range" id="speedSlider" min="0.1" max="100" value="1" step="0.5">
         </div>
 
         <div class="control-group">
@@ -737,6 +732,40 @@
 
         velocityArrow = createVelocityArrow();
 
+        // Helper function to thoroughly dispose of a Three.js object
+        function disposeObject(obj) {
+            if (!obj) return;
+
+            // Recursively dispose children first
+            while(obj.children && obj.children.length > 0) {
+                disposeObject(obj.children[0]);
+                obj.remove(obj.children[0]);
+            }
+
+            // Dispose geometry
+            if (obj.geometry) {
+                obj.geometry.dispose();
+            }
+
+            // Dispose material(s)
+            if (obj.material) {
+                if (Array.isArray(obj.material)) {
+                    obj.material.forEach(mat => {
+                        if (mat.map) mat.map.dispose();
+                        mat.dispose();
+                    });
+                } else {
+                    if (obj.material.map) obj.material.map.dispose();
+                    obj.material.dispose();
+                }
+            }
+
+            // Remove from parent
+            if (obj.parent) {
+                obj.parent.remove(obj);
+            }
+        }
+
         // Orbital mechanics calculations
         function calculateOrbitFromState(position, velocity) {
             const r = position.length();
@@ -1055,17 +1084,12 @@
         // UI Controls
         const sizeSlider = document.getElementById('sizeSlider');
         const heightSlider = document.getElementById('heightSlider');
-        const velocitySlider = document.getElementById('velocitySlider');
         const speedSlider = document.getElementById('speedSlider');
         const addButton = document.getElementById('addSatellite');
         const clearButton = document.getElementById('clearAll');
 
         sizeSlider.oninput = () => document.getElementById('sizeValue').textContent = sizeSlider.value;
         heightSlider.oninput = () => document.getElementById('heightValue').textContent = heightSlider.value;
-        velocitySlider.oninput = () => {
-            document.getElementById('velocityValue').textContent = velocitySlider.value + '%';
-            // Note: velocity slider is kept for future use but currently velocity is set by drag length
-        };
         speedSlider.oninput = () => {
             simulationSpeed = parseFloat(speedSlider.value);
             document.getElementById('speedValue').textContent = simulationSpeed.toFixed(1) + 'x';
@@ -1198,6 +1222,26 @@
             const trailPositions = [];
             const maxTrailLength = 100;
 
+            // Create persistent orbital path prediction
+            const orbitPoints = generateOrbitPoints(position, velocity);
+            const orbitPathGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(orbitPoints.length * 3);
+            orbitPoints.forEach((point, i) => {
+                positions[i * 3] = point.x;
+                positions[i * 3 + 1] = point.y;
+                positions[i * 3 + 2] = point.z;
+            });
+            orbitPathGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const orbitPathMaterial = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.3,
+                linewidth: 1
+            });
+            const orbitPath = new THREE.Line(orbitPathGeometry, orbitPathMaterial);
+            scene.add(orbitPath);
+
             scene.add(mesh);
 
             satellites.push({
@@ -1206,7 +1250,9 @@
                 trail,
                 trailPositions,
                 maxTrailLength,
-                size
+                size,
+                orbitPath,
+                color: color
             });
 
             updateCount();
@@ -1241,6 +1287,26 @@
             const trailPositions = [];
             const maxTrailLength = 150; // Longer trail
 
+            // Create persistent orbital path prediction
+            const orbitPoints = generateOrbitPoints(position, velocity);
+            const orbitPathGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(orbitPoints.length * 3);
+            orbitPoints.forEach((point, i) => {
+                positions[i * 3] = point.x;
+                positions[i * 3 + 1] = point.y;
+                positions[i * 3 + 2] = point.z;
+            });
+            orbitPathGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const orbitPathMaterial = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.4,
+                linewidth: 1
+            });
+            const orbitPath = new THREE.Line(orbitPathGeometry, orbitPathMaterial);
+            scene.add(orbitPath);
+
             scene.add(mesh);
 
             satellites.push({
@@ -1251,7 +1317,9 @@
                 maxTrailLength,
                 size,
                 isGeosync: true,
-                ring // Store ring reference
+                ring, // Store ring reference
+                orbitPath,
+                color: color
             });
 
             updateCount();
@@ -1286,54 +1354,58 @@
             // For a geosynchronous orbit, orbital period = planet rotation period
             // Using T = 2π√(r³/GM), we can solve for r
             // Assuming planet rotates once per 100 time units in our simulation
-            
+
             const planetRotationPeriod = 100; // Arbitrary units matching our simulation
             const orbitalRadius = Math.pow((G * planetMass * planetRotationPeriod * planetRotationPeriod) / (4 * Math.PI * Math.PI), 1/3);
-            
-            // Random orbital inclination (angle from equatorial plane)
-            const inclination = (Math.random() - 0.5) * Math.PI * 0.6; // Up to ±54 degrees
-            
+
+            // Random orbital inclination (angle from equatorial plane) - full range
+            const inclination = (Math.random() - 0.5) * Math.PI * 1.5; // Up to ±135 degrees for variety
+
             // Random starting angle in the orbital plane
-            const angle = Math.random() * Math.PI * 2;
-            
-            // Random rotation of the orbital plane
-            const planeRotation = Math.random() * Math.PI * 2;
-            
-            // Calculate position with inclination
-            const x = Math.cos(angle) * orbitalRadius;
-            const y = Math.sin(angle) * orbitalRadius * Math.sin(inclination);
-            const z = Math.sin(angle) * orbitalRadius * Math.cos(inclination);
-            
-            // Rotate the position around Y axis for plane rotation
+            const trueAnomaly = Math.random() * Math.PI * 2;
+
+            // Longitude of ascending node (rotation around the Y/polar axis)
+            const ascendingNode = Math.random() * Math.PI * 2;
+
+            // Position in the orbital plane (2D, before inclination)
+            const xOrbit = orbitalRadius * Math.cos(trueAnomaly);
+            const zOrbit = orbitalRadius * Math.sin(trueAnomaly);
+
+            // Apply inclination (rotate around X axis)
+            const xInclined = xOrbit;
+            const yInclined = zOrbit * Math.sin(inclination);
+            const zInclined = zOrbit * Math.cos(inclination);
+
+            // Apply ascending node rotation (rotate around Y axis)
             const position = new THREE.Vector3(
-                x * Math.cos(planeRotation) - z * Math.sin(planeRotation),
-                y,
-                x * Math.sin(planeRotation) + z * Math.cos(planeRotation)
+                xInclined * Math.cos(ascendingNode) - zInclined * Math.sin(ascendingNode),
+                yInclined,
+                xInclined * Math.sin(ascendingNode) + zInclined * Math.cos(ascendingNode)
             );
-            
+
             // Calculate perfect circular orbital velocity
             const orbitalSpeed = Math.sqrt((G * planetMass) / orbitalRadius);
-            
-            // Velocity vector perpendicular to position (tangent to orbit)
-            // This ensures circular orbit regardless of inclination
-            const posNorm = position.clone().normalize();
-            
-            // Create a perpendicular vector in the orbital plane
-            // Use cross product with a reference vector
-            let refVector = new THREE.Vector3(0, 1, 0);
-            // If position is too close to vertical, use different reference
-            if (Math.abs(posNorm.y) > 0.9) {
-                refVector = new THREE.Vector3(1, 0, 0);
-            }
-            
-            const tangent = new THREE.Vector3().crossVectors(posNorm, refVector).normalize();
-            const velocity = tangent.multiplyScalar(orbitalSpeed);
-            
-            // Add some random variation to make each orbit unique while keeping it stable
-            const randomTilt = (Math.random() - 0.5) * 0.1;
-            velocity.y += orbitalSpeed * randomTilt;
-            
-            // Make geosync satellites bigger and use box geometry
+
+            // Velocity direction in orbital plane (perpendicular to position in 2D)
+            const vxOrbit = -orbitalRadius * Math.sin(trueAnomaly);
+            const vzOrbit = orbitalRadius * Math.cos(trueAnomaly);
+
+            // Apply inclination to velocity
+            const vxInclined = vxOrbit;
+            const vyInclined = vzOrbit * Math.sin(inclination);
+            const vzInclined = vzOrbit * Math.cos(inclination);
+
+            // Apply ascending node rotation to velocity
+            const velocity = new THREE.Vector3(
+                vxInclined * Math.cos(ascendingNode) - vzInclined * Math.sin(ascendingNode),
+                vyInclined,
+                vxInclined * Math.sin(ascendingNode) + vzInclined * Math.cos(ascendingNode)
+            );
+
+            // Normalize and scale to correct speed
+            velocity.normalize().multiplyScalar(orbitalSpeed);
+
+            // Make geosync satellites bigger
             const geoSyncSize = 12; // Much larger than regular satellites
             createGeosyncSatellite(position, velocity, geoSyncSize, '#38ef7d');
         });
@@ -1342,12 +1414,16 @@
             satellites.forEach(sat => {
                 scene.remove(sat.mesh);
                 scene.remove(sat.trail);
+                if (sat.orbitPath) {
+                    scene.remove(sat.orbitPath);
+                }
             });
             satellites.length = 0;
 
             // Also cancel launch mode if active
             if (launchMode) {
                 if (previewSatellite) {
+                    disposeObject(previewSatellite);
                     scene.remove(previewSatellite);
                     previewSatellite = null;
                 }
@@ -1548,15 +1624,15 @@
                         // Valid elliptical orbit
                         const eVecNorm = orbit.eccentricityVector.clone().normalize();
 
+                        // Periapsis (closest point) - eccentricity vector points toward periapsis
+                        const pePosition = eVecNorm.clone().multiplyScalar(orbit.periapsis);
+                        periapsisMarker.position.copy(pePosition);
+                        periapsisMarker.visible = orbit.periapsis > planetRadius;
+
                         // Apoapsis (furthest point) - opposite direction of eccentricity vector
                         const apPosition = eVecNorm.clone().multiplyScalar(-orbit.apoapsis);
                         apoapsisMarker.position.copy(apPosition);
                         apoapsisMarker.visible = orbit.apoapsis > planetRadius;
-
-                        // Periapsis (closest point) - direction of eccentricity vector
-                        const pePosition = eVecNorm.clone().multiplyScalar(-orbit.periapsis);
-                        periapsisMarker.position.copy(pePosition);
-                        periapsisMarker.visible = orbit.periapsis > planetRadius;
                     } else {
                         // Not a closed orbit
                         apoapsisMarker.visible = false;
@@ -1596,6 +1672,7 @@
                 
                 // Clean up
                 if (previewSatellite) {
+                    disposeObject(previewSatellite);
                     scene.remove(previewSatellite);
                     previewSatellite = null;
                 }
@@ -1621,6 +1698,7 @@
             if (e.key === 'Escape' && launchMode) {
                 // Cancel launch mode
                 if (previewSatellite) {
+                    disposeObject(previewSatellite);
                     scene.remove(previewSatellite);
                     previewSatellite = null;
                 }
@@ -1675,7 +1753,7 @@
                 // Check collision with planet
                 if (distance < planetRadius + sat.size) {
                     // DRAMATIC EXPLOSION!
-                    const impactColor = sat.mesh.material.color;
+                    const impactColor = new THREE.Color(sat.color);
                     
                     // Create explosion particles
                     const explosion = new ExplosionParticle(position.clone(), impactColor);
@@ -1700,6 +1778,9 @@
                     // Clean up satellite
                     scene.remove(sat.mesh);
                     scene.remove(sat.trail);
+                    if (sat.orbitPath) {
+                        scene.remove(sat.orbitPath);
+                    }
                     satellites.splice(index, 1);
                     updateCount();
                     return;
