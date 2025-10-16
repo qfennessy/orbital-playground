@@ -1080,7 +1080,7 @@
             const bodyMaterial = new THREE.MeshStandardMaterial({
                 color: color,
                 emissive: color,
-                emissiveIntensity: 0.3,
+                emissiveIntensity: 0.7,
                 metalness: 0.9,
                 roughness: 0.2
             });
@@ -1090,9 +1090,9 @@
             // Solar panels (left)
             const panelGeometry = new THREE.BoxGeometry(size * 2, size * 0.1, size * 1.5);
             const panelMaterial = new THREE.MeshStandardMaterial({
-                color: 0x1a3a5c,
-                emissive: 0x0a1f3f,
-                emissiveIntensity: 0.2,
+                color: 0x2a5a8c,
+                emissive: 0x1a4a7f,
+                emissiveIntensity: 0.4,
                 metalness: 0.5,
                 roughness: 0.3
             });
@@ -1120,7 +1120,9 @@
             // Antenna
             const antennaGeometry = new THREE.CylinderGeometry(size * 0.1, size * 0.1, size * 1.5, 8);
             const antennaMaterial = new THREE.MeshStandardMaterial({
-                color: 0xcccccc,
+                color: 0xdddddd,
+                emissive: 0xaaaaaa,
+                emissiveIntensity: 0.5,
                 metalness: 0.9,
                 roughness: 0.1
             });
@@ -1131,7 +1133,9 @@
             // Dish
             const dishGeometry = new THREE.CylinderGeometry(size * 0.6, size * 0.3, size * 0.3, 16);
             const dishMaterial = new THREE.MeshStandardMaterial({
-                color: 0xeeeeee,
+                color: 0xffffff,
+                emissive: 0xcccccc,
+                emissiveIntensity: 0.4,
                 metalness: 0.8,
                 roughness: 0.2
             });
@@ -1140,16 +1144,27 @@
             dish.rotation.x = Math.PI / 6;
             group.add(dish);
 
-            // Glowing communication light
-            const lightGeometry = new THREE.SphereGeometry(size * 0.15, 8, 8);
+            // Glowing communication light (brighter)
+            const lightGeometry = new THREE.SphereGeometry(size * 0.2, 8, 8);
             const lightMaterial = new THREE.MeshBasicMaterial({
                 color: color,
                 transparent: true,
-                opacity: 0.9
+                opacity: 1.0
             });
             const light = new THREE.Mesh(lightGeometry, lightMaterial);
             light.position.y = -size * 0.5;
             group.add(light);
+
+            // Add a subtle glow halo around the satellite
+            const glowGeometry = new THREE.SphereGeometry(size * 1.8, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.15,
+                side: THREE.BackSide
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            group.add(glow);
 
             // Store references for animation
             group.userData = {
@@ -1158,7 +1173,8 @@
                 antenna,
                 dish,
                 light,
-                body
+                body,
+                glow
             };
 
             return group;
