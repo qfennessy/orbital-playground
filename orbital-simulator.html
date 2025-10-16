@@ -206,6 +206,150 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
+        .satellite-info {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(10, 10, 30, 0.9);
+            padding: 15px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            font-size: 12px;
+            color: #a8c5e6;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            min-width: 250px;
+            display: none;
+        }
+
+        .satellite-info.visible {
+            display: block;
+        }
+
+        .satellite-info .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 3px 0;
+        }
+
+        .satellite-info .stat-label {
+            color: #6eb5ff;
+            font-weight: bold;
+        }
+
+        .satellite-info .stat-value {
+            color: #ffffff;
+        }
+
+        .satellite-info .status {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .satellite-info .status.stable {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid #2ed573;
+        }
+
+        .satellite-info .status.decaying {
+            background: rgba(255, 159, 64, 0.2);
+            color: #ff9f40;
+            border: 1px solid #ff9f40;
+        }
+
+        .satellite-info .status.escape {
+            background: rgba(238, 82, 83, 0.2);
+            color: #ee5253;
+            border: 1px solid #ee5253;
+        }
+
+        .time-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(10, 10, 30, 0.85);
+            padding: 15px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .time-btn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .time-btn:active {
+            transform: translateY(0);
+        }
+
+        .time-btn.paused {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .satellite-type-selector {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .type-option {
+            flex: 1;
+            padding: 8px;
+            background: rgba(100, 150, 255, 0.1);
+            border: 2px solid rgba(100, 150, 255, 0.3);
+            border-radius: 6px;
+            color: #a8c5e6;
+            font-size: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .type-option:hover {
+            background: rgba(100, 150, 255, 0.2);
+            border-color: rgba(100, 150, 255, 0.5);
+        }
+
+        .type-option.selected {
+            background: rgba(110, 181, 255, 0.3);
+            border-color: #6eb5ff;
+            color: #6eb5ff;
+            font-weight: bold;
+        }
+
         .color-options {
             display: flex;
             gap: 8px;
@@ -230,10 +374,180 @@
             border-color: white;
             box-shadow: 0 0 20px currentColor;
         }
+
+        .mission-panel {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 30, 0.95);
+            padding: 20px 30px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+            min-width: 400px;
+            z-index: 1000;
+            text-align: center;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .mission-panel.hidden {
+            display: none;
+        }
+
+        .mission-toggle-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0;
+        }
+
+        .mission-toggle-btn:hover {
+            background: rgba(255, 100, 100, 0.3);
+            border-color: rgba(255, 100, 100, 0.6);
+            transform: scale(1.1);
+        }
+
+        .mission-title {
+            font-size: 14px;
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .mission-description {
+            font-size: 16px;
+            color: #ffffff;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .mission-objectives {
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .mission-objective {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            color: #a8c5e6;
+            font-size: 13px;
+        }
+
+        .objective-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #6eb5ff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .objective-checkbox.completed {
+            background: #2ed573;
+            border-color: #2ed573;
+        }
+
+        .objective-checkbox.completed::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .mission-progress {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(100, 150, 255, 0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(100, 150, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .mission-complete {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-color: #f5576c;
+            animation: missionPulse 1s ease-in-out;
+        }
+
+        @keyframes missionPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
+        }
+
+        .next-mission-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: none;
+            border-radius: 8px;
+            color: #0a0a1a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+        }
+
+        .next-mission-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+        }
     </style>
 </head>
 <body>
     <canvas id="canvas"></canvas>
+
+    <div class="mission-panel" id="missionPanel">
+        <button class="mission-toggle-btn" id="missionToggleBtn" title="Hide Missions">✕</button>
+        <div class="mission-title" id="missionTitle">Mission 1: First Launch</div>
+        <div class="mission-description" id="missionDescription">Launch your first satellite into orbit</div>
+        <div class="mission-objectives" id="missionObjectives">
+            <!-- Objectives will be inserted here -->
+        </div>
+        <div class="mission-progress">
+            <div style="font-size: 12px; color: #a8c5e6; margin-bottom: 5px;">
+                Progress: <span id="missionProgressText">0/1</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+        <button class="next-mission-btn" id="nextMissionBtn" style="display: none;">Next Mission →</button>
+    </div>
 
     <div class="controls">
         <h1>🛰️ Orbital Simulator</h1>
@@ -254,6 +568,16 @@
         </div>
 
         <div class="control-group">
+            <label>Satellite Type</label>
+            <div class="satellite-type-selector">
+                <div class="type-option selected" data-type="standard">Standard</div>
+                <div class="type-option" data-type="probe">Probe</div>
+                <div class="type-option" data-type="station">Station</div>
+                <div class="type-option" data-type="debris">Debris</div>
+            </div>
+        </div>
+
+        <div class="control-group">
             <label>Satellite Color</label>
             <div class="color-options">
                 <div class="color-option selected" style="background: #6eb5ff;" data-color="#6eb5ff"></div>
@@ -267,11 +591,42 @@
         <button id="addSatellite">Launch Satellite</button>
         <button id="addGeoSync" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);">Launch Geosynchronous</button>
         <button id="toggleGuides" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">Hide 3D Guides</button>
+        <button id="showMissionsBtn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4); display: none;">Show Missions</button>
         <button class="clear-btn" id="clearAll">Clear All Satellites</button>
     </div>
 
     <div class="satellite-count">
         Satellites: <span id="count">0</span>
+    </div>
+
+    <div class="satellite-info" id="satelliteInfo">
+        <div class="stat-row">
+            <span class="stat-label">Altitude:</span>
+            <span class="stat-value" id="infoAltitude">--</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Velocity:</span>
+            <span class="stat-value" id="infoVelocity">--</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Period:</span>
+            <span class="stat-value" id="infoPeriod">--</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Eccentricity:</span>
+            <span class="stat-value" id="infoEccentricity">--</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Type:</span>
+            <span class="stat-value" id="infoType">--</span>
+        </div>
+        <div class="status stable" id="infoStatus">STABLE ORBIT</div>
+    </div>
+
+    <div class="time-controls">
+        <button class="time-btn" id="stepBackward" title="Step Backward">◄</button>
+        <button class="time-btn" id="playPause" title="Pause/Play">❚❚</button>
+        <button class="time-btn" id="stepForward" title="Step Forward">►</button>
     </div>
 
     <div class="launch-mode" id="launchMode">
@@ -322,8 +677,30 @@
 
         // Create stars
         const starsGeometry = new THREE.BufferGeometry();
-        const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 2, transparent: true });
-        
+
+        // Create a circular texture for the stars
+        const starsCanvas = document.createElement('canvas');
+        starsCanvas.width = 32;
+        starsCanvas.height = 32;
+        const starsCtx = starsCanvas.getContext('2d');
+        const gradient = starsCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        starsCtx.fillStyle = gradient;
+        starsCtx.fillRect(0, 0, 32, 32);
+        const starsTexture = new THREE.CanvasTexture(starsCanvas);
+
+        const starsMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 2,
+            transparent: true,
+            map: starsTexture,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
         const starsVertices = [];
         for (let i = 0; i < 3000; i++) {
             const x = (Math.random() - 0.5) * 4000;
@@ -331,7 +708,7 @@
             const z = (Math.random() - 0.5) * 4000;
             starsVertices.push(x, y, z);
         }
-        
+
         starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
         const stars = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(stars);
@@ -677,8 +1054,13 @@
         const G = 100; // Gravitational constant (scaled for visualization)
         const planetMass = 1000;
 
-        // Selected color
+        // Selected color and type
         let selectedColor = '#6eb5ff';
+        let selectedType = 'standard';
+
+        // Time control state
+        let isPaused = false;
+        let hoveredSatellite = null;
 
         // Launch mode state
         let launchMode = false;
@@ -689,6 +1071,175 @@
         let predictedOrbitLine = null;
         let apoapsisMarker = null;
         let periapsisMarker = null;
+
+        // Mission System
+        const missions = [
+            {
+                id: 1,
+                title: "Mission 1: First Launch",
+                description: "Launch your first satellite into orbit",
+                objectives: [
+                    { id: "launch", text: "Launch a satellite", check: () => satellites.length > 0 }
+                ]
+            },
+            {
+                id: 2,
+                title: "Mission 2: Stable Orbit",
+                description: "Achieve a circular orbit with low eccentricity",
+                objectives: [
+                    { id: "circular", text: "Create orbit with eccentricity < 0.1", check: () => {
+                        return satellites.some(sat => {
+                            const orbit = calculateOrbitFromState(sat.mesh.position, sat.velocity);
+                            return orbit.eccentricity < 0.1 && orbit.eccentricity >= 0;
+                        });
+                    }}
+                ]
+            },
+            {
+                id: 3,
+                title: "Mission 3: High Orbit",
+                description: "Launch a satellite above 200 units altitude",
+                objectives: [
+                    { id: "highOrbit", text: "Achieve altitude > 200 units", check: () => {
+                        return satellites.some(sat => sat.mesh.position.length() - planetRadius > 200);
+                    }}
+                ]
+            },
+            {
+                id: 4,
+                title: "Mission 4: Constellation",
+                description: "Create a satellite constellation",
+                objectives: [
+                    { id: "three", text: "Have 3 satellites in orbit simultaneously", check: () => satellites.length >= 3 }
+                ]
+            },
+            {
+                id: 5,
+                title: "Mission 5: Elliptical Orbit",
+                description: "Create an elliptical orbit with moderate eccentricity",
+                objectives: [
+                    { id: "elliptical", text: "Create orbit with 0.3 < eccentricity < 0.7", check: () => {
+                        return satellites.some(sat => {
+                            const orbit = calculateOrbitFromState(sat.mesh.position, sat.velocity);
+                            return orbit.eccentricity > 0.3 && orbit.eccentricity < 0.7;
+                        });
+                    }}
+                ]
+            },
+            {
+                id: 6,
+                title: "Mission 6: Polar Coverage",
+                description: "Launch satellites for global coverage",
+                objectives: [
+                    { id: "polarSats", text: "Have 5 satellites in orbit", check: () => satellites.length >= 5 }
+                ]
+            },
+            {
+                id: 7,
+                title: "Mission 7: Mixed Fleet",
+                description: "Launch different types of satellites",
+                objectives: [
+                    { id: "standard", text: "Launch a standard satellite", check: () => launchedTypes.has('standard') },
+                    { id: "probe", text: "Launch a probe", check: () => launchedTypes.has('probe') },
+                    { id: "station", text: "Launch a station", check: () => launchedTypes.has('station') }
+                ]
+            },
+            {
+                id: 8,
+                title: "Mission 8: Geostationary Network",
+                description: "Create a geostationary satellite network",
+                objectives: [
+                    { id: "geoSync", text: "Launch 3 geosynchronous satellites", check: () => {
+                        return satellites.filter(sat => sat.isGeosync).length >= 3;
+                    }}
+                ]
+            }
+        ];
+
+        let currentMissionIndex = 0;
+        let completedObjectives = new Set();
+        let missionCompleted = false;
+        let launchedTypes = new Set();
+
+        // Load a mission by index
+        function loadMission(index) {
+            if (index >= missions.length) {
+                // All missions completed!
+                document.getElementById('missionTitle').textContent = "🎉 All Missions Complete!";
+                document.getElementById('missionDescription').textContent = "Congratulations! You've mastered orbital mechanics.";
+                document.getElementById('missionObjectives').innerHTML = '<div style="text-align: center; padding: 20px; color: #ffd700;">You are now a certified orbital engineer!</div>';
+                document.getElementById('nextMissionBtn').style.display = 'none';
+                document.querySelector('.mission-progress').style.display = 'none';
+                return;
+            }
+
+            currentMissionIndex = index;
+            const mission = missions[index];
+            completedObjectives.clear();
+            missionCompleted = false;
+
+            // Update mission info
+            document.getElementById('missionTitle').textContent = mission.title;
+            document.getElementById('missionDescription').textContent = mission.description;
+
+            // Create objectives list
+            const objectivesContainer = document.getElementById('missionObjectives');
+            objectivesContainer.innerHTML = '';
+            mission.objectives.forEach(obj => {
+                const objDiv = document.createElement('div');
+                objDiv.className = 'objective';
+                objDiv.id = `objective-${obj.id}`;
+                objDiv.innerHTML = `
+                    <span class="objective-checkbox">☐</span>
+                    <span class="objective-text">${obj.text}</span>
+                `;
+                objectivesContainer.appendChild(objDiv);
+            });
+
+            // Reset progress bar
+            document.getElementById('missionProgressText').textContent = `0/${mission.objectives.length}`;
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('nextMissionBtn').style.display = 'none';
+            document.getElementById('missionPanel').classList.remove('mission-complete');
+        }
+
+        // Update mission progress each frame
+        function updateMission() {
+            if (missionCompleted || currentMissionIndex >= missions.length) return;
+
+            const mission = missions[currentMissionIndex];
+            let completedCount = 0;
+
+            // Check each objective
+            mission.objectives.forEach(obj => {
+                const isComplete = obj.check();
+                const objElement = document.getElementById(`objective-${obj.id}`);
+
+                if (isComplete && !completedObjectives.has(obj.id)) {
+                    completedObjectives.add(obj.id);
+                    if (objElement) {
+                        objElement.classList.add('complete');
+                        objElement.querySelector('.objective-checkbox').textContent = '☑';
+                    }
+                }
+
+                if (completedObjectives.has(obj.id)) {
+                    completedCount++;
+                }
+            });
+
+            // Update progress bar
+            const progress = (completedCount / mission.objectives.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('missionProgressText').textContent = `${completedCount}/${mission.objectives.length}`;
+
+            // Check if mission is complete
+            if (completedCount === mission.objectives.length && !missionCompleted) {
+                missionCompleted = true;
+                document.getElementById('missionPanel').classList.add('mission-complete');
+                document.getElementById('nextMissionBtn').style.display = 'block';
+            }
+        }
 
         // Create velocity arrow visualization
         function createVelocityArrow() {
@@ -889,6 +1440,7 @@
             });
             const apMarker = new THREE.Mesh(apGeometry, apMaterial);
             apMarker.visible = false;
+            apMarker.position.set(0, 0, -10000); // Position far away when hidden
             scene.add(apMarker);
 
             // Create periapsis marker
@@ -900,6 +1452,7 @@
             });
             const peMarker = new THREE.Mesh(peGeometry, peMaterial);
             peMarker.visible = false;
+            peMarker.position.set(0, 0, -10000); // Position far away when hidden
             scene.add(peMarker);
 
             return { orbitLine, apMarker, peMarker };
@@ -1072,6 +1625,15 @@
         // Color selection
         let simulationSpeed = 1.0;
 
+        // Satellite type selection
+        document.querySelectorAll('.type-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+                e.target.classList.add('selected');
+                selectedType = e.target.dataset.type;
+            });
+        });
+
         // Color selection
         document.querySelectorAll('.color-option').forEach(option => {
             option.addEventListener('click', (e) => {
@@ -1095,118 +1657,315 @@
             document.getElementById('speedValue').textContent = simulationSpeed.toFixed(1) + 'x';
         };
 
-        // Create detailed satellite model
-        function createSatelliteModel(size, color) {
+        // Time control buttons
+        const playPauseBtn = document.getElementById('playPause');
+        const stepForwardBtn = document.getElementById('stepForward');
+        const stepBackwardBtn = document.getElementById('stepBackward');
+
+        playPauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+            playPauseBtn.textContent = isPaused ? '▶' : '❚❚';
+            playPauseBtn.classList.toggle('paused', isPaused);
+        });
+
+        stepForwardBtn.addEventListener('click', () => {
+            if (isPaused) {
+                // Advance simulation by one frame
+                updateSimulation();
+            }
+        });
+
+        stepBackwardBtn.addEventListener('click', () => {
+            if (isPaused) {
+                // Step backward by running simulation in reverse
+                updateSimulation(-1);
+            }
+        });
+
+        // Create satellite models based on type
+        function createSatelliteModel(size, color, type = 'standard') {
             const group = new THREE.Group();
 
-            // Main body (rectangular)
-            const bodyGeometry = new THREE.BoxGeometry(size, size * 0.7, size * 0.5);
-            const bodyMaterial = new THREE.MeshStandardMaterial({
-                color: color,
-                emissive: color,
-                emissiveIntensity: 0.7,
-                metalness: 0.9,
-                roughness: 0.2
-            });
-            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            group.add(body);
+            if (type === 'debris') {
+                // Debris: irregular broken pieces, no organized structure
+                const debrisColor = 0x666666; // Dull gray metal
 
-            // Solar panels (left)
-            const panelGeometry = new THREE.BoxGeometry(size * 2, size * 0.1, size * 1.5);
-            const panelMaterial = new THREE.MeshStandardMaterial({
-                color: 0x2a5a8c,
-                emissive: 0x1a4a7f,
-                emissiveIntensity: 0.4,
-                metalness: 0.5,
-                roughness: 0.3
-            });
+                // Create 3-5 random irregular fragments
+                const fragmentCount = 3 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < fragmentCount; i++) {
+                    const fragSize = size * (0.3 + Math.random() * 0.4);
+                    const shapes = ['box', 'cylinder', 'cone', 'sphere'];
+                    const shape = shapes[Math.floor(Math.random() * shapes.length)];
 
-            const leftPanel = new THREE.Mesh(panelGeometry, panelMaterial);
-            leftPanel.position.x = -size * 1.2;
-            group.add(leftPanel);
+                    let geometry;
+                    if (shape === 'box') {
+                        geometry = new THREE.BoxGeometry(
+                            fragSize * (0.5 + Math.random()),
+                            fragSize * (0.5 + Math.random()),
+                            fragSize * (0.5 + Math.random())
+                        );
+                    } else if (shape === 'cylinder') {
+                        geometry = new THREE.CylinderGeometry(
+                            fragSize * 0.3,
+                            fragSize * 0.4,
+                            fragSize,
+                            6
+                        );
+                    } else if (shape === 'cone') {
+                        geometry = new THREE.ConeGeometry(fragSize * 0.5, fragSize, 6);
+                    } else {
+                        geometry = new THREE.SphereGeometry(fragSize * 0.4, 6, 6);
+                    }
 
-            // Solar panels (right)
-            const rightPanel = new THREE.Mesh(panelGeometry, panelMaterial);
-            rightPanel.position.x = size * 1.2;
-            group.add(rightPanel);
+                    const material = new THREE.MeshStandardMaterial({
+                        color: debrisColor,
+                        metalness: 0.7,
+                        roughness: 0.8,
+                        emissive: debrisColor,
+                        emissiveIntensity: 0.1
+                    });
 
-            // Add grid pattern to solar panels
-            const gridGeometry = new THREE.EdgesGeometry(panelGeometry);
-            const gridMaterial = new THREE.LineBasicMaterial({ color: 0x3a7abd, linewidth: 1 });
-            const leftGrid = new THREE.LineSegments(gridGeometry, gridMaterial);
-            leftGrid.position.copy(leftPanel.position);
-            group.add(leftGrid);
+                    const fragment = new THREE.Mesh(geometry, material);
+                    fragment.position.set(
+                        (Math.random() - 0.5) * size,
+                        (Math.random() - 0.5) * size,
+                        (Math.random() - 0.5) * size
+                    );
+                    fragment.rotation.set(
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI
+                    );
+                    group.add(fragment);
+                }
 
-            const rightGrid = new THREE.LineSegments(gridGeometry, gridMaterial);
-            rightGrid.position.copy(rightPanel.position);
-            group.add(rightGrid);
+                // Add broken solar panel fragment
+                const brokenPanelGeo = new THREE.BoxGeometry(size * 1.2, size * 0.05, size * 0.6);
+                const brokenPanelMat = new THREE.MeshStandardMaterial({
+                    color: 0x1a3a5c,
+                    metalness: 0.6,
+                    roughness: 0.7
+                });
+                const brokenPanel = new THREE.Mesh(brokenPanelGeo, brokenPanelMat);
+                brokenPanel.position.set(size * 0.5, 0, size * 0.3);
+                brokenPanel.rotation.set(0.5, 0.3, 0.8);
+                group.add(brokenPanel);
 
-            // Antenna
-            const antennaGeometry = new THREE.CylinderGeometry(size * 0.1, size * 0.1, size * 1.5, 8);
-            const antennaMaterial = new THREE.MeshStandardMaterial({
-                color: 0xdddddd,
-                emissive: 0xaaaaaa,
-                emissiveIntensity: 0.5,
-                metalness: 0.9,
-                roughness: 0.1
-            });
-            const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
-            antenna.position.y = size * 1.1;
-            group.add(antenna);
+                group.userData = { isDebris: true };
 
-            // Dish
-            const dishGeometry = new THREE.CylinderGeometry(size * 0.6, size * 0.3, size * 0.3, 16);
-            const dishMaterial = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                emissive: 0xcccccc,
-                emissiveIntensity: 0.4,
-                metalness: 0.8,
-                roughness: 0.2
-            });
-            const dish = new THREE.Mesh(dishGeometry, dishMaterial);
-            dish.position.y = size * 1.8;
-            dish.rotation.x = Math.PI / 6;
-            group.add(dish);
+            } else if (type === 'probe') {
+                // Probe: compact, spherical core with small antenna
+                const coreGeometry = new THREE.SphereGeometry(size * 0.5, 16, 16);
+                const coreMaterial = new THREE.MeshStandardMaterial({
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.6,
+                    metalness: 0.9,
+                    roughness: 0.3
+                });
+                const core = new THREE.Mesh(coreGeometry, coreMaterial);
+                group.add(core);
 
-            // Glowing communication light (brighter)
-            const lightGeometry = new THREE.SphereGeometry(size * 0.2, 8, 8);
-            const lightMaterial = new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: 1.0
-            });
-            const light = new THREE.Mesh(lightGeometry, lightMaterial);
-            light.position.y = -size * 0.5;
-            group.add(light);
+                // Small antenna
+                const antennaGeometry = new THREE.CylinderGeometry(size * 0.05, size * 0.05, size * 1.2, 8);
+                const antennaMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xcccccc,
+                    metalness: 0.9,
+                    roughness: 0.1
+                });
+                const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+                antenna.position.y = size * 0.8;
+                group.add(antenna);
 
-            // Add a subtle glow halo around the satellite
-            const glowGeometry = new THREE.SphereGeometry(size * 1.8, 16, 16);
-            const glowMaterial = new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: 0.15,
-                side: THREE.BackSide
-            });
-            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-            group.add(glow);
+                // Compact solar panels
+                for (let i = 0; i < 4; i++) {
+                    const panelGeo = new THREE.BoxGeometry(size * 0.8, size * 0.05, size * 0.4);
+                    const panelMat = new THREE.MeshStandardMaterial({
+                        color: 0x2a5a8c,
+                        metalness: 0.5,
+                        roughness: 0.3
+                    });
+                    const panel = new THREE.Mesh(panelGeo, panelMat);
+                    const angle = (i / 4) * Math.PI * 2;
+                    panel.position.set(Math.cos(angle) * size * 0.6, 0, Math.sin(angle) * size * 0.6);
+                    panel.rotation.y = angle;
+                    group.add(panel);
+                }
 
-            // Store references for animation
-            group.userData = {
-                leftPanel,
-                rightPanel,
-                antenna,
-                dish,
-                light,
-                body,
-                glow
-            };
+                const light = new THREE.PointLight(color, 0.5, size * 3);
+                light.position.set(0, 0, 0);
+                group.add(light);
+
+                group.userData = { core, antenna };
+
+            } else if (type === 'station') {
+                // Station: large modular structure
+                // Central module
+                const centralGeo = new THREE.CylinderGeometry(size * 0.8, size * 0.8, size * 1.5, 8);
+                const centralMat = new THREE.MeshStandardMaterial({
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.5,
+                    metalness: 0.8,
+                    roughness: 0.3
+                });
+                const central = new THREE.Mesh(centralGeo, centralMat);
+                central.rotation.z = Math.PI / 2;
+                group.add(central);
+
+                // Side modules
+                for (let i = 0; i < 3; i++) {
+                    const moduleGeo = new THREE.BoxGeometry(size * 0.6, size * 0.6, size);
+                    const moduleMat = new THREE.MeshStandardMaterial({
+                        color: new THREE.Color(color).multiplyScalar(0.8),
+                        emissive: color,
+                        emissiveIntensity: 0.3,
+                        metalness: 0.8,
+                        roughness: 0.4
+                    });
+                    const module = new THREE.Mesh(moduleGeo, moduleMat);
+                    module.position.x = (i - 1) * size * 1.2;
+                    group.add(module);
+                }
+
+                // Large solar arrays
+                const arrayGeo = new THREE.BoxGeometry(size * 3, size * 0.08, size * 1.8);
+                const arrayMat = new THREE.MeshStandardMaterial({
+                    color: 0x1a4a7f,
+                    metalness: 0.6,
+                    roughness: 0.2
+                });
+
+                const leftArray = new THREE.Mesh(arrayGeo, arrayMat);
+                leftArray.position.set(-size * 2, 0, 0);
+                group.add(leftArray);
+
+                const rightArray = new THREE.Mesh(arrayGeo, arrayMat);
+                rightArray.position.set(size * 2, 0, 0);
+                group.add(rightArray);
+
+                // Communication dish
+                const dishGeo = new THREE.CylinderGeometry(size * 0.8, size * 0.4, size * 0.4, 16);
+                const dishMat = new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    metalness: 0.9,
+                    roughness: 0.1
+                });
+                const dish = new THREE.Mesh(dishGeo, dishMat);
+                dish.position.set(0, size * 1.2, 0);
+                dish.rotation.x = Math.PI / 4;
+                group.add(dish);
+
+                const glow = new THREE.PointLight(color, 1, size * 5);
+                group.add(glow);
+
+                group.userData = { central, dish };
+
+            } else {
+                // Standard satellite: current design
+                const bodyGeometry = new THREE.BoxGeometry(size, size * 0.7, size * 0.5);
+                const bodyMaterial = new THREE.MeshStandardMaterial({
+                    color: color,
+                    emissive: color,
+                    emissiveIntensity: 0.7,
+                    metalness: 0.9,
+                    roughness: 0.2
+                });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                group.add(body);
+
+                const panelGeometry = new THREE.BoxGeometry(size * 2, size * 0.1, size * 1.5);
+                const panelMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x2a5a8c,
+                    emissive: 0x1a4a7f,
+                    emissiveIntensity: 0.4,
+                    metalness: 0.5,
+                    roughness: 0.3
+                });
+
+                const leftPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+                leftPanel.position.x = -size * 1.2;
+                group.add(leftPanel);
+
+                const rightPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+                rightPanel.position.x = size * 1.2;
+                group.add(rightPanel);
+
+                const gridGeometry = new THREE.EdgesGeometry(panelGeometry);
+                const gridMaterial = new THREE.LineBasicMaterial({ color: 0x3a7abd, linewidth: 1 });
+                const leftGrid = new THREE.LineSegments(gridGeometry, gridMaterial);
+                leftGrid.position.copy(leftPanel.position);
+                group.add(leftGrid);
+
+                const rightGrid = new THREE.LineSegments(gridGeometry, gridMaterial);
+                rightGrid.position.copy(rightPanel.position);
+                group.add(rightGrid);
+
+                const antennaGeometry = new THREE.CylinderGeometry(size * 0.1, size * 0.1, size * 1.5, 8);
+                const antennaMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xdddddd,
+                    emissive: 0xaaaaaa,
+                    emissiveIntensity: 0.5,
+                    metalness: 0.9,
+                    roughness: 0.1
+                });
+                const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+                antenna.position.y = size * 1.1;
+                group.add(antenna);
+
+                const dishGeometry = new THREE.CylinderGeometry(size * 0.6, size * 0.3, size * 0.3, 16);
+                const dishMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    emissive: 0xcccccc,
+                    emissiveIntensity: 0.4,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
+                const dish = new THREE.Mesh(dishGeometry, dishMaterial);
+                dish.position.y = size * 1.8;
+                dish.rotation.x = Math.PI / 6;
+                group.add(dish);
+
+                const lightGeometry = new THREE.SphereGeometry(size * 0.2, 8, 8);
+                const lightMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 1.0
+                });
+                const light = new THREE.Mesh(lightGeometry, lightMaterial);
+                light.position.y = -size * 0.5;
+                group.add(light);
+
+                const glowGeometry = new THREE.SphereGeometry(size * 1.8, 16, 16);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.15,
+                    side: THREE.BackSide
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                group.add(glow);
+
+                group.userData = {
+                    leftPanel,
+                    rightPanel,
+                    antenna,
+                    dish,
+                    light,
+                    body,
+                    glow
+                };
+            }
 
             return group;
         }
 
         function createSatellite(position, velocity, size, color) {
-            const mesh = createSatelliteModel(size, color);
+            const mesh = createSatelliteModel(size, color, selectedType);
             mesh.position.copy(position);
+
+            // Track launched satellite type for Mission 7
+            launchedTypes.add(selectedType);
 
             // Create trail
             const trailGeometry = new THREE.BufferGeometry();
@@ -1242,6 +2001,39 @@
             const orbitPath = new THREE.Line(orbitPathGeometry, orbitPathMaterial);
             scene.add(orbitPath);
 
+            // Create apoapsis marker (red)
+            const apGeometry = new THREE.SphereGeometry(2.5, 12, 12);
+            const apMaterial = new THREE.MeshBasicMaterial({
+                color: 0xff4444,
+                transparent: true,
+                opacity: 0.8
+            });
+            const apoapsisMarker = new THREE.Mesh(apGeometry, apMaterial);
+            scene.add(apoapsisMarker);
+
+            // Create periapsis marker (green)
+            const peGeometry = new THREE.SphereGeometry(2.5, 12, 12);
+            const peMaterial = new THREE.MeshBasicMaterial({
+                color: 0x44ff44,
+                transparent: true,
+                opacity: 0.8
+            });
+            const periapsisMarker = new THREE.Mesh(peGeometry, peMaterial);
+            scene.add(periapsisMarker);
+
+            // Calculate initial orbital parameters and marker positions
+            const orbit = calculateOrbitFromState(position, velocity);
+            if (orbit.eccentricity < 1.0 && orbit.semiMajorAxis > 0) {
+                const eVecNorm = orbit.eccentricityVector.clone().normalize();
+                periapsisMarker.position.copy(eVecNorm.clone().multiplyScalar(orbit.periapsis));
+                apoapsisMarker.position.copy(eVecNorm.clone().multiplyScalar(-orbit.apoapsis));
+                apoapsisMarker.visible = orbit.apoapsis > planetRadius;
+                periapsisMarker.visible = orbit.periapsis > planetRadius;
+            } else {
+                apoapsisMarker.visible = false;
+                periapsisMarker.visible = false;
+            }
+
             scene.add(mesh);
 
             satellites.push({
@@ -1252,40 +2044,36 @@
                 maxTrailLength,
                 size,
                 orbitPath,
-                color: color
+                apoapsisMarker,
+                periapsisMarker,
+                color: color,
+                type: selectedType
             });
 
             updateCount();
         }
 
-        // Special function for geosynchronous satellites with distinctive appearance
+        // Special function for geosynchronous satellites (same appearance as standard)
         function createGeosyncSatellite(position, velocity, size, color) {
-            const mesh = createSatelliteModel(size, color);
+            const mesh = createSatelliteModel(size, color, 'standard');
             mesh.position.copy(position);
 
-            // Add a glowing ring around geosync satellites to distinguish them
-            const ringGeometry = new THREE.TorusGeometry(size * 2, size * 0.15, 8, 24);
-            const ringMaterial = new THREE.MeshBasicMaterial({
-                color: color,
-                transparent: true,
-                opacity: 0.6
-            });
-            const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-            mesh.add(ring);
+            // Track launched satellite type for Mission 7
+            launchedTypes.add('standard');
 
-            // Create brighter trail for geosync
+            // Create trail (same as standard satellites)
             const trailGeometry = new THREE.BufferGeometry();
             const trailMaterial = new THREE.LineBasicMaterial({
                 color: color,
                 transparent: true,
-                opacity: 0.8,
-                linewidth: 3
+                opacity: 0.6,
+                linewidth: 2
             });
             const trail = new THREE.Line(trailGeometry, trailMaterial);
             scene.add(trail);
 
             const trailPositions = [];
-            const maxTrailLength = 150; // Longer trail
+            const maxTrailLength = 100;
 
             // Create persistent orbital path prediction
             const orbitPoints = generateOrbitPoints(position, velocity);
@@ -1301,11 +2089,44 @@
             const orbitPathMaterial = new THREE.LineBasicMaterial({
                 color: color,
                 transparent: true,
-                opacity: 0.4,
+                opacity: 0.3,
                 linewidth: 1
             });
             const orbitPath = new THREE.Line(orbitPathGeometry, orbitPathMaterial);
             scene.add(orbitPath);
+
+            // Create apoapsis marker (red)
+            const apGeometry = new THREE.SphereGeometry(2.5, 12, 12);
+            const apMaterial = new THREE.MeshBasicMaterial({
+                color: 0xff4444,
+                transparent: true,
+                opacity: 0.8
+            });
+            const apoapsisMarker = new THREE.Mesh(apGeometry, apMaterial);
+            scene.add(apoapsisMarker);
+
+            // Create periapsis marker (green)
+            const peGeometry = new THREE.SphereGeometry(2.5, 12, 12);
+            const peMaterial = new THREE.MeshBasicMaterial({
+                color: 0x44ff44,
+                transparent: true,
+                opacity: 0.8
+            });
+            const periapsisMarker = new THREE.Mesh(peGeometry, peMaterial);
+            scene.add(periapsisMarker);
+
+            // Calculate initial orbital parameters and marker positions
+            const orbit = calculateOrbitFromState(position, velocity);
+            if (orbit.eccentricity < 1.0 && orbit.semiMajorAxis > 0) {
+                const eVecNorm = orbit.eccentricityVector.clone().normalize();
+                periapsisMarker.position.copy(eVecNorm.clone().multiplyScalar(orbit.periapsis));
+                apoapsisMarker.position.copy(eVecNorm.clone().multiplyScalar(-orbit.apoapsis));
+                apoapsisMarker.visible = orbit.apoapsis > planetRadius;
+                periapsisMarker.visible = orbit.periapsis > planetRadius;
+            } else {
+                apoapsisMarker.visible = false;
+                periapsisMarker.visible = false;
+            }
 
             scene.add(mesh);
 
@@ -1317,8 +2138,10 @@
                 maxTrailLength,
                 size,
                 isGeosync: true,
-                ring, // Store ring reference
+                type: 'standard',
                 orbitPath,
+                apoapsisMarker,
+                periapsisMarker,
                 color: color
             });
 
@@ -1408,6 +2231,10 @@
             // Make geosync satellites bigger
             const geoSyncSize = 12; // Much larger than regular satellites
             createGeosyncSatellite(position, velocity, geoSyncSize, '#38ef7d');
+
+            // Display info for the newly launched geosync satellite
+            const newSatellite = satellites[satellites.length - 1];
+            displaySatelliteInfo(newSatellite);
         });
 
         clearButton.addEventListener('click', () => {
@@ -1416,6 +2243,12 @@
                 scene.remove(sat.trail);
                 if (sat.orbitPath) {
                     scene.remove(sat.orbitPath);
+                }
+                if (sat.apoapsisMarker) {
+                    scene.remove(sat.apoapsisMarker);
+                }
+                if (sat.periapsisMarker) {
+                    scene.remove(sat.periapsisMarker);
                 }
             });
             satellites.length = 0;
@@ -1453,6 +2286,61 @@
 
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
+
+        // Function to display satellite info in the panel
+        function displaySatelliteInfo(satellite) {
+            const infoPanel = document.getElementById('satelliteInfo');
+            infoPanel.classList.add('visible');
+
+            // Calculate orbital parameters
+            const altitude = satellite.mesh.position.length() - planetRadius;
+            const velocity = satellite.velocity.length();
+            const orbit = calculateOrbitFromState(satellite.mesh.position, satellite.velocity);
+
+            // Update info display
+            document.getElementById('infoAltitude').textContent = altitude.toFixed(1) + ' units';
+            document.getElementById('infoVelocity').textContent = velocity.toFixed(2) + ' units/s';
+            document.getElementById('infoEccentricity').textContent = orbit.eccentricity.toFixed(3);
+
+            // Calculate orbital period
+            if (orbit.eccentricity < 1.0 && orbit.semiMajorAxis > 0) {
+                const period = 2 * Math.PI * Math.sqrt(Math.pow(orbit.semiMajorAxis, 3) / (G * planetMass));
+                document.getElementById('infoPeriod').textContent = (period / 60).toFixed(1) + ' min';
+            } else {
+                document.getElementById('infoPeriod').textContent = 'Escape/Collision';
+            }
+
+            // Display satellite type
+            const typeNames = {
+                'standard': 'Standard',
+                'probe': 'Probe',
+                'station': 'Station',
+                'debris': 'Debris'
+            };
+            let typeName = typeNames[satellite.type] || 'Standard';
+            if (satellite.isGeosync) {
+                typeName = 'Geosync ' + typeName;
+            }
+            document.getElementById('infoType').textContent = typeName;
+
+            // Show orbit status
+            const statusElement = document.querySelector('.satellite-info .status');
+            if (statusElement) {
+                if (altitude < planetRadius * 0.1) {
+                    statusElement.textContent = 'DECAYING ORBIT';
+                    statusElement.className = 'status decaying';
+                } else if (orbit.eccentricity >= 1.0) {
+                    statusElement.textContent = 'ESCAPE TRAJECTORY';
+                    statusElement.className = 'status escape';
+                } else if (orbit.eccentricity < 0.15) {
+                    statusElement.textContent = 'STABLE ORBIT';
+                    statusElement.className = 'status stable';
+                } else {
+                    statusElement.textContent = 'ELLIPTICAL ORBIT';
+                    statusElement.className = 'status stable';
+                }
+            }
+        }
 
         function getMousePosition(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -1527,7 +2415,7 @@
                 
                 // Create preview satellite at the actual click point
                 const size = parseFloat(sizeSlider.value);
-                previewSatellite = createSatelliteModel(size, selectedColor);
+                previewSatellite = createSatelliteModel(size, selectedColor, selectedType);
                 previewSatellite.position.copy(launchStartPos);
                 previewSatellite.traverse((child) => {
                     if (child.material) {
@@ -1653,7 +2541,47 @@
 
                 previousMousePosition = { x: e.clientX, y: e.clientY };
             }
+
+            // Check for hover over satellites (when not in launch mode and not dragging)
+            if (!launchMode && !isDragging) {
+                getMousePosition(e);
+                raycaster.setFromCamera(mouse, camera);
+
+                // Check intersections with satellite meshes
+                const satelliteMeshes = satellites.map(sat => sat.mesh);
+                const intersects = raycaster.intersectObjects(satelliteMeshes, true);
+
+                if (intersects.length > 0) {
+                    // Find which satellite was hit
+                    const hitMesh = intersects[0].object;
+                    const satellite = satellites.find(sat =>
+                        sat.mesh === hitMesh || sat.mesh.children.includes(hitMesh) || isChildOfMesh(hitMesh, sat.mesh)
+                    );
+
+                    if (satellite) {
+                        // Display satellite info using shared function
+                        displaySatelliteInfo(satellite);
+                        canvas.style.cursor = 'pointer';
+                    }
+                } else {
+                    // No satellite hovered
+                    document.getElementById('satelliteInfo').classList.remove('visible');
+                    if (!launchMode) {
+                        canvas.style.cursor = 'grab';
+                    }
+                }
+            }
         });
+
+        // Helper function to check if a mesh is a child of another mesh
+        function isChildOfMesh(child, parent) {
+            let current = child.parent;
+            while (current) {
+                if (current === parent) return true;
+                current = current.parent;
+            }
+            return false;
+        }
 
         canvas.addEventListener('mouseup', (e) => {
             if (launchMode && launchStartPos && launchCurrentPos && isDragging && e.button === 0) {
@@ -1664,12 +2592,16 @@
                 
                 if (velocityVector.length() > 0.5) {
                     const velocity = velocityVector.multiplyScalar(2); // Scale factor for velocity
-                    
+
                     // Create satellite with this velocity
                     const size = parseFloat(sizeSlider.value);
                     createSatellite(launchStartPos, velocity, size, selectedColor);
+
+                    // Display info for the newly launched satellite
+                    const newSatellite = satellites[satellites.length - 1];
+                    displaySatelliteInfo(newSatellite);
                 }
-                
+
                 // Clean up
                 if (previewSatellite) {
                     disposeObject(previewSatellite);
@@ -1693,8 +2625,9 @@
             }
         });
 
-        // ESC key to cancel launch mode
+        // Keyboard controls
         document.addEventListener('keydown', (e) => {
+            // ESC key to cancel launch mode
             if (e.key === 'Escape' && launchMode) {
                 // Cancel launch mode
                 if (previewSatellite) {
@@ -1712,6 +2645,14 @@
                 document.getElementById('launchMode').classList.remove('active');
                 canvas.style.cursor = 'grab';
             }
+
+            // Spacebar to pause/unpause simulation
+            if (e.key === ' ' || e.code === 'Space') {
+                e.preventDefault(); // Prevent page scroll
+                isPaused = !isPaused;
+                playPauseBtn.textContent = isPaused ? '▶' : '❚❚';
+                playPauseBtn.classList.toggle('paused', isPaused);
+            }
         });
 
         canvas.addEventListener('wheel', (e) => {
@@ -1720,32 +2661,25 @@
             cameraDistance = Math.max(150, Math.min(1000, cameraDistance));
         });
 
-        // Animation loop
-        let time = 0;
-        function animate() {
-            requestAnimationFrame(animate);
-            time += 0.01 * simulationSpeed;
+        // Simulation update function (extracted for pause/step control)
+        function updateSimulation(direction = 1) {
+            // direction: 1 = forward, -1 = backward
+            time += 0.01 * simulationSpeed * direction;
 
             // Update planet shader
             planetMaterial.uniforms.time.value = time;
             cloudMaterial.uniforms.time.value = time;
 
             // Rotate planet slowly
-            planet.rotation.y += 0.001 * simulationSpeed;
-            
-            // Rotate clouds slightly faster for parallax effect
-            clouds.rotation.y += 0.0015 * simulationSpeed;
-            
-            atmosphere.rotation.y += 0.001 * simulationSpeed;
+            planet.rotation.y += 0.001 * simulationSpeed * direction;
 
-            // Update camera position
-            camera.position.x = cameraDistance * Math.sin(cameraAngle.theta) * Math.cos(cameraAngle.phi);
-            camera.position.y = cameraDistance * Math.sin(cameraAngle.phi);
-            camera.position.z = cameraDistance * Math.cos(cameraAngle.theta) * Math.cos(cameraAngle.phi);
-            camera.lookAt(0, 0, 0);
+            // Rotate clouds slightly faster for parallax effect
+            clouds.rotation.y += 0.0015 * simulationSpeed * direction;
+
+            atmosphere.rotation.y += 0.001 * simulationSpeed * direction;
 
             // Update satellites
-            const dt = 0.016 * simulationSpeed; // Apply simulation speed to time delta
+            const dt = 0.016 * simulationSpeed * direction; // Apply simulation speed and direction to time delta
             satellites.forEach((sat, index) => {
                 const position = sat.mesh.position;
                 const distance = position.length();
@@ -1754,32 +2688,38 @@
                 if (distance < planetRadius + sat.size) {
                     // DRAMATIC EXPLOSION!
                     const impactColor = new THREE.Color(sat.color);
-                    
+
                     // Create explosion particles
                     const explosion = new ExplosionParticle(position.clone(), impactColor);
                     explosions.push(explosion);
-                    
+
                     // Create shockwave
                     const shockwave = createShockwave(position.clone(), impactColor);
                     explosions.push(shockwave);
-                    
+
                     // Camera shake based on satellite size
                     triggerCameraShake(sat.size * 0.5, 20);
-                    
+
                     // Screen flash
                     createFlash(`rgba(${parseInt(impactColor.getHexString().slice(0,2), 16)}, ${parseInt(impactColor.getHexString().slice(2,4), 16)}, ${parseInt(impactColor.getHexString().slice(4,6), 16)}, 0.3)`);
-                    
+
                     // Add temporary bright light at impact
                     const impactLight = new THREE.PointLight(impactColor, 3, 300);
                     impactLight.position.copy(position);
                     scene.add(impactLight);
                     setTimeout(() => scene.remove(impactLight), 200);
-                    
+
                     // Clean up satellite
                     scene.remove(sat.mesh);
                     scene.remove(sat.trail);
                     if (sat.orbitPath) {
                         scene.remove(sat.orbitPath);
+                    }
+                    if (sat.apoapsisMarker) {
+                        scene.remove(sat.apoapsisMarker);
+                    }
+                    if (sat.periapsisMarker) {
+                        scene.remove(sat.periapsisMarker);
                     }
                     satellites.splice(index, 1);
                     updateCount();
@@ -1787,9 +2727,9 @@
                 }
 
                 // Calculate gravitational force
-                const direction = position.clone().normalize();
+                const directionVec = position.clone().normalize();
                 const forceMagnitude = (G * planetMass) / (distance * distance);
-                const force = direction.multiplyScalar(-forceMagnitude);
+                const force = directionVec.multiplyScalar(-forceMagnitude);
 
                 // Update velocity and position
                 sat.velocity.add(force.multiplyScalar(dt));
@@ -1812,7 +2752,14 @@
                 sat.trail.geometry.attributes.position.needsUpdate = true;
 
                 // Rotate satellite body slowly
-                sat.mesh.rotation.y += 0.01 * simulationSpeed;
+                if (sat.mesh.userData.isDebris) {
+                    // Debris tumbles erratically on all axes
+                    sat.mesh.rotation.x += 0.05 * simulationSpeed * direction;
+                    sat.mesh.rotation.y += 0.07 * simulationSpeed * direction;
+                    sat.mesh.rotation.z += 0.03 * simulationSpeed * direction;
+                } else {
+                    sat.mesh.rotation.y += 0.01 * simulationSpeed * direction;
+                }
 
                 // Animate satellite components
                 if (sat.mesh.userData) {
@@ -1827,12 +2774,6 @@
                         sat.mesh.userData.dish.rotation.x = Math.PI / 6 + Math.sin(time * 0.5) * 0.1;
                     }
                 }
-
-                // Rotate ring for geosync satellites
-                if (sat.isGeosync && sat.ring) {
-                    sat.ring.rotation.x += 0.01 * simulationSpeed;
-                    sat.ring.rotation.y += 0.02 * simulationSpeed;
-                }
             });
 
             // Update explosions
@@ -1843,12 +2784,33 @@
                 }
             }
 
-            // Update camera shake
+            // Slowly rotate stars
+            stars.rotation.y += 0.0001 * simulationSpeed * direction;
+        }
+
+        // Animation loop
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Only update simulation if not paused
+            if (!isPaused) {
+                updateSimulation();
+            }
+
+            // Update mission progress (always update even when paused)
+            updateMission();
+
+            // Update camera position (always update even when paused)
+            camera.position.x = cameraDistance * Math.sin(cameraAngle.theta) * Math.cos(cameraAngle.phi);
+            camera.position.y = cameraDistance * Math.sin(cameraAngle.phi);
+            camera.position.z = cameraDistance * Math.cos(cameraAngle.theta) * Math.cos(cameraAngle.phi);
+            camera.lookAt(0, 0, 0);
+
+            // Update camera shake (always update)
             updateCameraShake();
 
-            // Slowly rotate stars
-            stars.rotation.y += 0.0001 * simulationSpeed;
-
+            // Render the scene
             renderer.render(scene, camera);
         }
 
@@ -1869,6 +2831,34 @@
         const pos2 = new THREE.Vector3(0, 0, 200);
         const vel2 = new THREE.Vector3(Math.sqrt((G * planetMass) / 200), 0, 0);
         createSatellite(pos2, vel2, 6, '#ff6eb5');
+
+        // Initialize first mission
+        loadMission(0);
+
+        // Wire up Next Mission button
+        document.getElementById('nextMissionBtn').addEventListener('click', () => {
+            loadMission(currentMissionIndex + 1);
+        });
+
+        // Mission panel toggle functionality
+        let missionsVisible = true;
+        const missionPanel = document.getElementById('missionPanel');
+        const missionToggleBtn = document.getElementById('missionToggleBtn');
+        const showMissionsBtn = document.getElementById('showMissionsBtn');
+
+        // Hide missions button (X on the panel)
+        missionToggleBtn.addEventListener('click', () => {
+            missionsVisible = false;
+            missionPanel.classList.add('hidden');
+            showMissionsBtn.style.display = 'block';
+        });
+
+        // Show missions button (in controls)
+        showMissionsBtn.addEventListener('click', () => {
+            missionsVisible = true;
+            missionPanel.classList.remove('hidden');
+            showMissionsBtn.style.display = 'none';
+        });
     </script>
 </body>
 </html>
