@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital Mechanics Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #000000, #0a0a1a);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #canvas:active {
+            cursor: grabbing;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(10, 10, 30, 0.85);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            max-width: 320px;
+            z-index: 1000;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #6eb5ff;
+            text-shadow: 0 0 10px rgba(110, 181, 255, 0.5);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #a8c5e6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(100, 150, 255, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6eb5ff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(110, 181, 255, 0.8);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6eb5ff;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(110, 181, 255, 0.8);
+        }
+
+        .value-display {
+            display: inline-block;
+            float: right;
+            color: #6eb5ff;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .clear-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .clear-btn:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        .info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(10, 10, 30, 0.85);
+            padding: 15px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            font-size: 11px;
+            color: #a8c5e6;
+            max-width: 320px;
+        }
+
+        .info strong {
+            color: #6eb5ff;
+        }
+
+        .launch-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            display: none;
+            z-index: 2000;
+            pointer-events: none;
+        }
+
+        .launch-mode.active {
+            display: flex;
+        }
+
+        .launch-instruction {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 30, 0.9);
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid #6eb5ff;
+            font-size: 13px;
+            color: #6eb5ff;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(110, 181, 255, 0.4);
+            white-space: nowrap;
+        }
+
+        .launch-instruction strong {
+            color: #fff;
+        }
+
+        .satellite-count {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 10, 30, 0.85);
+            padding: 15px 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 150, 255, 0.3);
+            font-size: 18px;
+            color: #6eb5ff;
+            font-weight: bold;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .color-options {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 20px currentColor;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div class="controls">
+        <h1>🛰️ Orbital Simulator</h1>
+        
+        <div class="control-group">
+            <label>Satellite Size <span class="value-display" id="sizeValue">5</span></label>
+            <input type="range" id="sizeSlider" min="2" max="15" value="5" step="0.5">
+        </div>
+
+        <div class="control-group">
+            <label>Orbital Height <span class="value-display" id="heightValue">150</span></label>
+            <input type="range" id="heightSlider" min="80" max="400" value="150" step="5">
+        </div>
+
+        <div class="control-group">
+            <label>Velocity <span class="value-display" id="velocityValue">100%</span></label>
+            <input type="range" id="velocitySlider" min="50" max="150" value="100" step="5">
+        </div>
+
+        <div class="control-group">
+            <label>Simulation Speed <span class="value-display" id="speedValue">1.0x</span></label>
+            <input type="range" id="speedSlider" min="0.1" max="5" value="1" step="0.1">
+        </div>
+
+        <div class="control-group">
+            <label>Satellite Color</label>
+            <div class="color-options">
+                <div class="color-option selected" style="background: #6eb5ff;" data-color="#6eb5ff"></div>
+                <div class="color-option" style="background: #ff6eb5;" data-color="#ff6eb5"></div>
+                <div class="color-option" style="background: #6effb5;" data-color="#6effb5"></div>
+                <div class="color-option" style="background: #ffb56e;" data-color="#ffb56e"></div>
+                <div class="color-option" style="background: #b56eff;" data-color="#b56eff"></div>
+            </div>
+        </div>
+
+        <button id="addSatellite">Launch Satellite</button>
+        <button id="addGeoSync" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);">Launch Geosynchronous</button>
+        <button id="toggleGuides" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">Hide 3D Guides</button>
+        <button class="clear-btn" id="clearAll">Clear All Satellites</button>
+    </div>
+
+    <div class="satellite-count">
+        Satellites: <span id="count">0</span>
+    </div>
+
+    <div class="launch-mode" id="launchMode">
+        <div class="launch-instruction">
+            🎯 <strong>LAUNCH MODE:</strong> Click where you want satellite • Drag to set velocity • Blue line shows predicted orbit • <strong>Red</strong> = apoapsis, <strong>Green</strong> = periapsis • <strong>ESC</strong> to cancel
+        </div>
+    </div>
+
+    <div class="info">
+        <strong>Controls:</strong><br>
+        • Click & drag anywhere to rotate view<br>
+        • Right-click drag also rotates view<br>
+        • Scroll to zoom in/out<br>
+        <br>
+        <strong>Launch Mode Tips:</strong><br>
+        • Drag <strong>horizontally</strong> = orbital motion<br>
+        • Drag <strong>up/down</strong> = vertical velocity<br>
+        • <strong>Diagonal</strong> = combined motion<br>
+        • Blue line shows predicted elliptical orbit<br>
+        • Red/green markers show apoapsis/periapsis<br>
+        <br>
+        <strong>Physics:</strong> Real orbital mechanics! See your exact trajectory before launch. Geosynchronous satellites maintain orbital period. Try circular, elliptical, or crash-course orbits!
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const canvas = document.getElementById('canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        camera.position.set(0, 200, 500);
+        camera.lookAt(0, 0, 0);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1.5, 2000);
+        pointLight.position.set(200, 200, 200);
+        scene.add(pointLight);
+
+        const planetLight = new THREE.PointLight(0x6eb5ff, 0.5, 500);
+        scene.add(planetLight);
+
+        // Create stars
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 2, transparent: true });
+        
+        const starsVertices = [];
+        for (let i = 0; i < 3000; i++) {
+            const x = (Math.random() - 0.5) * 4000;
+            const y = (Math.random() - 0.5) * 4000;
+            const z = (Math.random() - 0.5) * 4000;
+            starsVertices.push(x, y, z);
+        }
+        
+        starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+
+        // Create planet with detailed surface
+        const planetRadius = 50;
+        const planetGeometry = new THREE.SphereGeometry(planetRadius, 256, 256);
+        
+        // Create detailed planet material with procedural textures
+        const planetMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 }
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                varying vec2 vUv;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    vPosition = position;
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                varying vec2 vUv;
+
+                // Improved noise functions
+                float hash(vec2 p) {
+                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+                }
+
+                float noise(vec2 p) {
+                    vec2 i = floor(p);
+                    vec2 f = fract(p);
+                    f = f * f * (3.0 - 2.0 * f);
+
+                    float a = hash(i);
+                    float b = hash(i + vec2(1.0, 0.0));
+                    float c = hash(i + vec2(0.0, 1.0));
+                    float d = hash(i + vec2(1.0, 1.0));
+
+                    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+                }
+
+                float fbm(vec2 p) {
+                    float value = 0.0;
+                    float amplitude = 0.5;
+                    for(int i = 0; i < 6; i++) {
+                        value += amplitude * noise(p);
+                        p *= 2.0;
+                        amplitude *= 0.5;
+                    }
+                    return value;
+                }
+
+                // Ridged noise for mountains
+                float ridgedNoise(vec2 p) {
+                    return 1.0 - abs(noise(p) * 2.0 - 1.0);
+                }
+
+                float ridgedFbm(vec2 p) {
+                    float value = 0.0;
+                    float amplitude = 0.5;
+                    for(int i = 0; i < 4; i++) {
+                        value += amplitude * ridgedNoise(p);
+                        p *= 2.5;
+                        amplitude *= 0.4;
+                    }
+                    return value;
+                }
+
+                void main() {
+                    vec2 uv = vUv * 4.0;
+
+                    // Large-scale continent shapes
+                    float continentNoise = fbm(uv * 0.8 + vec2(time * 0.01, 0.0));
+
+                    // Add tectonic plate-like features
+                    float tectonicNoise = fbm(uv * 0.3 + vec2(15.0, 7.0));
+
+                    // Elevation map with mountains
+                    float elevation = fbm(uv * 2.0);
+                    float mountains = ridgedFbm(uv * 4.0) * 0.6;
+
+                    // Combine for terrain height
+                    float terrainHeight = continentNoise + mountains * 0.3;
+
+                    // Water levels - deeper oceans, shallow coasts
+                    float waterLevel = 0.45;
+                    float landMask = smoothstep(waterLevel - 0.02, waterLevel + 0.02, terrainHeight);
+
+                    // Ocean colors - deep to shallow
+                    vec3 deepOcean = vec3(0.02, 0.05, 0.15);
+                    vec3 shallowOcean = vec3(0.1, 0.3, 0.5);
+                    float oceanDepth = (waterLevel - terrainHeight) / waterLevel;
+                    vec3 oceanColor = mix(shallowOcean, deepOcean, smoothstep(0.0, 1.0, oceanDepth));
+
+                    // Land elevation colors
+                    vec3 beachColor = vec3(0.76, 0.70, 0.50);    // Sand
+                    vec3 grassColor = vec3(0.2, 0.5, 0.2);       // Lowland grass
+                    vec3 forestColor = vec3(0.1, 0.3, 0.1);      // Dense forest
+                    vec3 rockColor = vec3(0.4, 0.35, 0.3);       // Mountain rock
+                    vec3 snowColor = vec3(0.9, 0.92, 0.95);      // Mountain peaks
+
+                    // Calculate land elevation above sea level
+                    float landElevation = (terrainHeight - waterLevel) / (1.0 - waterLevel);
+
+                    // Terrain type based on elevation and noise
+                    vec3 landColor;
+                    if (landElevation < 0.08) {
+                        // Beach/coast
+                        landColor = beachColor;
+                    } else if (landElevation < 0.3) {
+                        // Grassland
+                        landColor = mix(grassColor, forestColor, fbm(uv * 8.0));
+                    } else if (landElevation < 0.6) {
+                        // Forest/hills
+                        float forestVariation = noise(uv * 6.0);
+                        landColor = mix(forestColor, grassColor, forestVariation * 0.3);
+                    } else if (landElevation < 0.8) {
+                        // Mountains
+                        float rockVariation = fbm(uv * 10.0);
+                        landColor = mix(rockColor, forestColor, rockVariation * 0.4);
+                    } else {
+                        // Snow-capped peaks
+                        float snowMix = smoothstep(0.75, 0.9, landElevation);
+                        landColor = mix(rockColor, snowColor, snowMix);
+                    }
+
+                    // Add desert regions (based on latitude and tectonic)
+                    float desertMask = smoothstep(0.3, 0.5, abs(vUv.y - 0.5)) *
+                                      smoothstep(0.4, 0.6, tectonicNoise);
+                    vec3 desertColor = vec3(0.8, 0.65, 0.4);
+                    landColor = mix(landColor, desertColor, desertMask * landMask * 0.7);
+
+                    // Base color
+                    vec3 baseColor = mix(oceanColor, landColor, landMask);
+
+                    // Polar ice caps
+                    float polarFactor = abs(vUv.y - 0.5) * 2.0;
+                    float iceMask = smoothstep(0.82, 0.96, polarFactor);
+                    vec3 polarIce = vec3(0.95, 0.97, 1.0);
+                    baseColor = mix(baseColor, polarIce, iceMask);
+
+                    // Add fine detail variation
+                    float microDetail = fbm(uv * 16.0) * 0.05;
+                    baseColor += microDetail;
+
+                    // Enhanced ocean specular highlights
+                    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+                    float oceanSpecular = pow(max(dot(vNormal, lightDir), 0.0), 40.0) *
+                                         (1.0 - landMask) * 0.8;
+                    baseColor += vec3(1.0, 1.0, 1.0) * oceanSpecular;
+
+                    // Subsurface scattering for shallow water
+                    float sss = (1.0 - landMask) * landMask * 0.3;
+                    baseColor += vec3(0.1, 0.4, 0.5) * sss;
+
+                    // Atmospheric rim lighting
+                    float rimIntensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+                    vec3 atmosphereGlow = vec3(0.3, 0.5, 0.9) * rimIntensity * 0.4;
+
+                    // Day/night terminator (subtle)
+                    float dayNight = dot(vNormal, lightDir) * 0.5 + 0.5;
+                    baseColor *= 0.3 + dayNight * 0.7;
+
+                    gl_FragColor = vec4(baseColor + atmosphereGlow, 1.0);
+                }
+            `
+        });
+        
+        const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+        scene.add(planet);
+
+        // Add cloud layer
+        const cloudGeometry = new THREE.SphereGeometry(planetRadius * 1.01, 64, 64);
+        const cloudMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                void main() {
+                    vUv = uv;
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                
+                float hash(vec2 p) {
+                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+                }
+                
+                float noise(vec2 p) {
+                    vec2 i = floor(p);
+                    vec2 f = fract(p);
+                    f = f * f * (3.0 - 2.0 * f);
+                    
+                    float a = hash(i);
+                    float b = hash(i + vec2(1.0, 0.0));
+                    float c = hash(i + vec2(0.0, 1.0));
+                    float d = hash(i + vec2(1.0, 1.0));
+                    
+                    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+                }
+                
+                float fbm(vec2 p) {
+                    float value = 0.0;
+                    float amplitude = 0.5;
+                    for(int i = 0; i < 4; i++) {
+                        value += amplitude * noise(p);
+                        p *= 2.0;
+                        amplitude *= 0.5;
+                    }
+                    return value;
+                }
+                
+                void main() {
+                    // Animated clouds
+                    vec2 uv = vUv * 6.0 + vec2(time * 0.02, 0.0);
+                    float cloudPattern = fbm(uv);
+                    
+                    // Make clouds wispy
+                    float clouds = smoothstep(0.4, 0.7, cloudPattern);
+                    
+                    // Fade at edges
+                    float edgeFade = pow(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.5);
+                    clouds *= edgeFade;
+                    
+                    gl_FragColor = vec4(1.0, 1.0, 1.0, clouds * 0.4);
+                }
+            `,
+            transparent: true,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+        
+        const clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
+        scene.add(clouds);
+
+        // Store reference for animation
+        const cloudMaterial_ref = cloudMaterial;
+
+        // Add atmosphere glow
+        const atmosphereGeometry = new THREE.SphereGeometry(planetRadius * 1.15, 64, 64);
+        const atmosphereMaterial = new THREE.ShaderMaterial({
+            uniforms: {},
+            vertexShader: `
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vNormal;
+                void main() {
+                    float intensity = pow(0.5 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+                    gl_FragColor = vec4(0.3, 0.6, 1.0, 1.0) * intensity;
+                }
+            `,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending,
+            transparent: true
+        });
+        
+        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        scene.add(atmosphere);
+
+        // Add reference grid to help visualize 3D space
+        const gridHelper = new THREE.GridHelper(400, 20, 0x444444, 0x222222);
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.3;
+        scene.add(gridHelper);
+
+        // Add orbital plane reference circle
+        const orbitRingGeometry = new THREE.TorusGeometry(150, 0.5, 8, 64);
+        const orbitRingMaterial = new THREE.MeshBasicMaterial({
+            color: 0x4488ff,
+            transparent: true,
+            opacity: 0.2
+        });
+        const orbitRing = new THREE.Mesh(orbitRingGeometry, orbitRingMaterial);
+        orbitRing.rotation.x = Math.PI / 2;
+        scene.add(orbitRing);
+
+        // Add axis helpers for spatial reference
+        const axisLength = 200;
+        const xAxis = new THREE.ArrowHelper(
+            new THREE.Vector3(1, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+            axisLength,
+            0xff4444,
+            20,
+            10
+        );
+        xAxis.line.material.transparent = true;
+        xAxis.line.material.opacity = 0.3;
+        xAxis.cone.material.transparent = true;
+        xAxis.cone.material.opacity = 0.3;
+        scene.add(xAxis);
+
+        const yAxis = new THREE.ArrowHelper(
+            new THREE.Vector3(0, 1, 0),
+            new THREE.Vector3(0, 0, 0),
+            axisLength,
+            0x44ff44,
+            20,
+            10
+        );
+        yAxis.line.material.transparent = true;
+        yAxis.line.material.opacity = 0.3;
+        yAxis.cone.material.transparent = true;
+        yAxis.cone.material.opacity = 0.3;
+        scene.add(yAxis);
+
+        const zAxis = new THREE.ArrowHelper(
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(0, 0, 0),
+            axisLength,
+            0x4444ff,
+            20,
+            10
+        );
+        zAxis.line.material.transparent = true;
+        zAxis.line.material.opacity = 0.3;
+        zAxis.cone.material.transparent = true;
+        zAxis.cone.material.opacity = 0.3;
+        scene.add(zAxis);
+
+        // Satellites array
+        const satellites = [];
+        const explosions = [];
+        const G = 100; // Gravitational constant (scaled for visualization)
+        const planetMass = 1000;
+
+        // Selected color
+        let selectedColor = '#6eb5ff';
+
+        // Launch mode state
+        let launchMode = false;
+        let launchStartPos = null;
+        let launchCurrentPos = null;
+        let previewSatellite = null;
+        let velocityArrow = null;
+        let predictedOrbitLine = null;
+        let apoapsisMarker = null;
+        let periapsisMarker = null;
+
+        // Create velocity arrow visualization
+        function createVelocityArrow() {
+            const group = new THREE.Group();
+            
+            // Arrow shaft - thicker for better visibility
+            const shaftGeometry = new THREE.CylinderGeometry(1.5, 1.5, 1, 8);
+            const shaftMaterial = new THREE.MeshBasicMaterial({ 
+                color: selectedColor,
+                transparent: true,
+                opacity: 0.9
+            });
+            const shaft = new THREE.Mesh(shaftGeometry, shaftMaterial);
+            
+            // Arrow head - larger
+            const headGeometry = new THREE.ConeGeometry(4, 8, 8);
+            const headMaterial = new THREE.MeshBasicMaterial({ 
+                color: selectedColor,
+                transparent: true,
+                opacity: 0.9
+            });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            
+            // Add a pulsing sphere at the tip to show velocity magnitude
+            const tipGeometry = new THREE.SphereGeometry(3, 16, 16);
+            const tipMaterial = new THREE.MeshBasicMaterial({
+                color: selectedColor,
+                transparent: true,
+                opacity: 0.7
+            });
+            const tip = new THREE.Mesh(tipGeometry, tipMaterial);
+            
+            group.add(shaft);
+            group.add(head);
+            group.add(tip);
+            group.visible = false;
+            scene.add(group);
+            
+            return { group, shaft, head, tip, material: shaftMaterial, headMaterial, tipMaterial };
+        }
+
+        velocityArrow = createVelocityArrow();
+
+        // Orbital mechanics calculations
+        function calculateOrbitFromState(position, velocity) {
+            const r = position.length();
+            const v = velocity.length();
+            const vr = position.dot(velocity) / r; // Radial velocity component
+
+            // Specific orbital energy
+            const specificEnergy = (v * v) / 2 - (G * planetMass) / r;
+
+            // Semi-major axis
+            const a = -(G * planetMass) / (2 * specificEnergy);
+
+            // Eccentricity vector
+            const eVec = new THREE.Vector3()
+                .copy(velocity)
+                .cross(position.clone().cross(velocity))
+                .divideScalar(G * planetMass)
+                .sub(position.clone().normalize());
+            const e = eVec.length();
+
+            // Angular momentum vector (defines orbital plane)
+            const h = new THREE.Vector3().crossVectors(position, velocity);
+            const hMag = h.length();
+
+            // Periapsis and apoapsis distances
+            const rp = a * (1 - e);
+            const ra = a * (1 + e);
+
+            return {
+                semiMajorAxis: a,
+                eccentricity: e,
+                eccentricityVector: eVec,
+                angularMomentum: h,
+                angularMomentumMag: hMag,
+                periapsis: rp,
+                apoapsis: ra,
+                energy: specificEnergy
+            };
+        }
+
+        function generateOrbitPoints(position, velocity, numPoints = 100) {
+            const orbit = calculateOrbitFromState(position, velocity);
+
+            // Check if orbit is valid (elliptical, not hyperbolic or parabolic)
+            if (orbit.eccentricity >= 1.0 || orbit.semiMajorAxis <= 0) {
+                // Hyperbolic or parabolic orbit - just simulate forward in time
+                return simulateOrbitPoints(position, velocity, numPoints);
+            }
+
+            const points = [];
+            const a = orbit.semiMajorAxis;
+            const e = orbit.eccentricity;
+
+            // Create a coordinate system for the orbital plane
+            const eVecNorm = orbit.eccentricityVector.clone().normalize();
+            const hNorm = orbit.angularMomentum.clone().normalize();
+            const qVec = new THREE.Vector3().crossVectors(hNorm, eVecNorm).normalize();
+
+            // Generate points around the ellipse
+            for (let i = 0; i <= numPoints; i++) {
+                const theta = (i / numPoints) * Math.PI * 2; // True anomaly
+                const r = (a * (1 - e * e)) / (1 + e * Math.cos(theta));
+
+                // Position in orbital plane coordinates
+                const x = r * Math.cos(theta);
+                const y = r * Math.sin(theta);
+
+                // Transform to 3D space
+                const point = new THREE.Vector3()
+                    .addScaledVector(eVecNorm, x)
+                    .addScaledVector(qVec, y);
+
+                points.push(point);
+            }
+
+            return points;
+        }
+
+        function simulateOrbitPoints(position, velocity, numPoints = 100) {
+            // For hyperbolic/parabolic orbits, simulate forward in time
+            const points = [];
+            const pos = position.clone();
+            const vel = velocity.clone();
+            const dt = 0.5; // Time step
+
+            for (let i = 0; i < numPoints; i++) {
+                points.push(pos.clone());
+
+                // Simple Euler integration for visualization
+                const r = pos.length();
+                const force = pos.clone().normalize().multiplyScalar(-(G * planetMass) / (r * r));
+                vel.add(force.multiplyScalar(dt));
+                pos.add(vel.clone().multiplyScalar(dt));
+
+                // Stop if we hit the planet
+                if (r < planetRadius) break;
+            }
+
+            return points;
+        }
+
+        function createOrbitVisualization() {
+            // Create orbit line
+            const orbitGeometry = new THREE.BufferGeometry();
+            const orbitMaterial = new THREE.LineBasicMaterial({
+                color: selectedColor,
+                transparent: true,
+                opacity: 0.6,
+                linewidth: 2
+            });
+            const orbitLine = new THREE.Line(orbitGeometry, orbitMaterial);
+            orbitLine.visible = false;
+            scene.add(orbitLine);
+
+            // Create apoapsis marker
+            const apGeometry = new THREE.SphereGeometry(3, 16, 16);
+            const apMaterial = new THREE.MeshBasicMaterial({
+                color: 0xff6666,
+                transparent: true,
+                opacity: 0.8
+            });
+            const apMarker = new THREE.Mesh(apGeometry, apMaterial);
+            apMarker.visible = false;
+            scene.add(apMarker);
+
+            // Create periapsis marker
+            const peGeometry = new THREE.SphereGeometry(3, 16, 16);
+            const peMaterial = new THREE.MeshBasicMaterial({
+                color: 0x66ff66,
+                transparent: true,
+                opacity: 0.8
+            });
+            const peMarker = new THREE.Mesh(peGeometry, peMaterial);
+            peMarker.visible = false;
+            scene.add(peMarker);
+
+            return { orbitLine, apMarker, peMarker };
+        }
+
+        const orbitViz = createOrbitVisualization();
+        predictedOrbitLine = orbitViz.orbitLine;
+        apoapsisMarker = orbitViz.apMarker;
+        periapsisMarker = orbitViz.peMarker;
+
+        // Explosion particle class
+        class ExplosionParticle {
+            constructor(position, color) {
+                this.particles = [];
+                const particleCount = 100;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const geometry = new THREE.SphereGeometry(Math.random() * 2 + 0.5, 8, 8);
+                    const material = new THREE.MeshBasicMaterial({
+                        color: color,
+                        transparent: true,
+                        opacity: 1
+                    });
+                    const particle = new THREE.Mesh(geometry, material);
+                    
+                    particle.position.copy(position);
+                    
+                    // Random velocity in all directions
+                    const speed = Math.random() * 5 + 2;
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.random() * Math.PI;
+                    
+                    particle.velocity = new THREE.Vector3(
+                        Math.sin(phi) * Math.cos(theta) * speed,
+                        Math.sin(phi) * Math.sin(theta) * speed,
+                        Math.cos(phi) * speed
+                    );
+                    
+                    particle.life = 1.0;
+                    particle.decay = Math.random() * 0.015 + 0.01;
+                    
+                    scene.add(particle);
+                    this.particles.push(particle);
+                }
+                
+                this.age = 0;
+            }
+            
+            update() {
+                this.age++;
+                let allDead = true;
+                
+                this.particles.forEach(particle => {
+                    if (particle.life > 0) {
+                        allDead = false;
+                        
+                        // Update position
+                        particle.position.add(particle.velocity.clone().multiplyScalar(0.5));
+                        
+                        // Apply gravity
+                        const direction = particle.position.clone().normalize();
+                        particle.velocity.add(direction.multiplyScalar(-0.1));
+                        
+                        // Fade out
+                        particle.life -= particle.decay;
+                        particle.material.opacity = particle.life;
+                        
+                        // Shrink
+                        const scale = particle.life;
+                        particle.scale.set(scale, scale, scale);
+                    }
+                });
+                
+                return allDead;
+            }
+            
+            cleanup() {
+                this.particles.forEach(particle => {
+                    scene.remove(particle);
+                    particle.geometry.dispose();
+                    particle.material.dispose();
+                });
+            }
+        }
+
+        // Create shockwave effect
+        function createShockwave(position, color) {
+            const geometry = new THREE.RingGeometry(1, 2, 32);
+            const material = new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.8,
+                side: THREE.DoubleSide
+            });
+            const shockwave = new THREE.Mesh(geometry, material);
+            
+            // Orient the ring to face outward from planet center
+            const direction = position.clone().normalize();
+            shockwave.lookAt(direction);
+            shockwave.position.copy(position);
+            
+            scene.add(shockwave);
+            
+            return {
+                mesh: shockwave,
+                scale: 1,
+                maxScale: 30,
+                opacity: 0.8,
+                update: function() {
+                    this.scale += 1.5;
+                    this.opacity -= 0.02;
+                    
+                    this.mesh.scale.set(this.scale, this.scale, 1);
+                    this.mesh.material.opacity = this.opacity;
+                    
+                    return this.opacity <= 0;
+                },
+                cleanup: function() {
+                    scene.remove(this.mesh);
+                    this.mesh.geometry.dispose();
+                    this.mesh.material.dispose();
+                }
+            };
+        }
+
+        // Create camera shake effect
+        let cameraShake = { intensity: 0, duration: 0 };
+        
+        function triggerCameraShake(intensity, duration) {
+            cameraShake.intensity = intensity;
+            cameraShake.duration = duration;
+        }
+        
+        function updateCameraShake() {
+            if (cameraShake.duration > 0) {
+                const shakeX = (Math.random() - 0.5) * cameraShake.intensity;
+                const shakeY = (Math.random() - 0.5) * cameraShake.intensity;
+                const shakeZ = (Math.random() - 0.5) * cameraShake.intensity;
+                
+                camera.position.x += shakeX;
+                camera.position.y += shakeY;
+                camera.position.z += shakeZ;
+                
+                cameraShake.duration--;
+                cameraShake.intensity *= 0.9;
+            }
+        }
+
+        // Create flash effect
+        function createFlash(color) {
+            const flash = document.createElement('div');
+            flash.style.position = 'fixed';
+            flash.style.top = '0';
+            flash.style.left = '0';
+            flash.style.width = '100%';
+            flash.style.height = '100%';
+            flash.style.background = color;
+            flash.style.opacity = '0.6';
+            flash.style.pointerEvents = 'none';
+            flash.style.zIndex = '9999';
+            document.body.appendChild(flash);
+            
+            setTimeout(() => {
+                flash.style.transition = 'opacity 0.3s';
+                flash.style.opacity = '0';
+                setTimeout(() => flash.remove(), 300);
+            }, 50);
+        }
+
+        // Color selection
+        let simulationSpeed = 1.0;
+
+        // Color selection
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                e.target.classList.add('selected');
+                selectedColor = e.target.dataset.color;
+            });
+        });
+
+        // UI Controls
+        const sizeSlider = document.getElementById('sizeSlider');
+        const heightSlider = document.getElementById('heightSlider');
+        const velocitySlider = document.getElementById('velocitySlider');
+        const speedSlider = document.getElementById('speedSlider');
+        const addButton = document.getElementById('addSatellite');
+        const clearButton = document.getElementById('clearAll');
+
+        sizeSlider.oninput = () => document.getElementById('sizeValue').textContent = sizeSlider.value;
+        heightSlider.oninput = () => document.getElementById('heightValue').textContent = heightSlider.value;
+        velocitySlider.oninput = () => {
+            document.getElementById('velocityValue').textContent = velocitySlider.value + '%';
+            // Note: velocity slider is kept for future use but currently velocity is set by drag length
+        };
+        speedSlider.oninput = () => {
+            simulationSpeed = parseFloat(speedSlider.value);
+            document.getElementById('speedValue').textContent = simulationSpeed.toFixed(1) + 'x';
+        };
+
+        // Create detailed satellite model
+        function createSatelliteModel(size, color) {
+            const group = new THREE.Group();
+
+            // Main body (rectangular)
+            const bodyGeometry = new THREE.BoxGeometry(size, size * 0.7, size * 0.5);
+            const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.3,
+                metalness: 0.9,
+                roughness: 0.2
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            group.add(body);
+
+            // Solar panels (left)
+            const panelGeometry = new THREE.BoxGeometry(size * 2, size * 0.1, size * 1.5);
+            const panelMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a3a5c,
+                emissive: 0x0a1f3f,
+                emissiveIntensity: 0.2,
+                metalness: 0.5,
+                roughness: 0.3
+            });
+
+            const leftPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+            leftPanel.position.x = -size * 1.2;
+            group.add(leftPanel);
+
+            // Solar panels (right)
+            const rightPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+            rightPanel.position.x = size * 1.2;
+            group.add(rightPanel);
+
+            // Add grid pattern to solar panels
+            const gridGeometry = new THREE.EdgesGeometry(panelGeometry);
+            const gridMaterial = new THREE.LineBasicMaterial({ color: 0x3a7abd, linewidth: 1 });
+            const leftGrid = new THREE.LineSegments(gridGeometry, gridMaterial);
+            leftGrid.position.copy(leftPanel.position);
+            group.add(leftGrid);
+
+            const rightGrid = new THREE.LineSegments(gridGeometry, gridMaterial);
+            rightGrid.position.copy(rightPanel.position);
+            group.add(rightGrid);
+
+            // Antenna
+            const antennaGeometry = new THREE.CylinderGeometry(size * 0.1, size * 0.1, size * 1.5, 8);
+            const antennaMaterial = new THREE.MeshStandardMaterial({
+                color: 0xcccccc,
+                metalness: 0.9,
+                roughness: 0.1
+            });
+            const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+            antenna.position.y = size * 1.1;
+            group.add(antenna);
+
+            // Dish
+            const dishGeometry = new THREE.CylinderGeometry(size * 0.6, size * 0.3, size * 0.3, 16);
+            const dishMaterial = new THREE.MeshStandardMaterial({
+                color: 0xeeeeee,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+            const dish = new THREE.Mesh(dishGeometry, dishMaterial);
+            dish.position.y = size * 1.8;
+            dish.rotation.x = Math.PI / 6;
+            group.add(dish);
+
+            // Glowing communication light
+            const lightGeometry = new THREE.SphereGeometry(size * 0.15, 8, 8);
+            const lightMaterial = new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.9
+            });
+            const light = new THREE.Mesh(lightGeometry, lightMaterial);
+            light.position.y = -size * 0.5;
+            group.add(light);
+
+            // Store references for animation
+            group.userData = {
+                leftPanel,
+                rightPanel,
+                antenna,
+                dish,
+                light,
+                body
+            };
+
+            return group;
+        }
+
+        function createSatellite(position, velocity, size, color) {
+            const mesh = createSatelliteModel(size, color);
+            mesh.position.copy(position);
+
+            // Create trail
+            const trailGeometry = new THREE.BufferGeometry();
+            const trailMaterial = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.6,
+                linewidth: 2
+            });
+            const trail = new THREE.Line(trailGeometry, trailMaterial);
+            scene.add(trail);
+
+            const trailPositions = [];
+            const maxTrailLength = 100;
+
+            scene.add(mesh);
+
+            satellites.push({
+                mesh,
+                velocity: velocity.clone(),
+                trail,
+                trailPositions,
+                maxTrailLength,
+                size
+            });
+
+            updateCount();
+        }
+
+        // Special function for geosynchronous satellites with distinctive appearance
+        function createGeosyncSatellite(position, velocity, size, color) {
+            const mesh = createSatelliteModel(size, color);
+            mesh.position.copy(position);
+
+            // Add a glowing ring around geosync satellites to distinguish them
+            const ringGeometry = new THREE.TorusGeometry(size * 2, size * 0.15, 8, 24);
+            const ringMaterial = new THREE.MeshBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.6
+            });
+            const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+            mesh.add(ring);
+
+            // Create brighter trail for geosync
+            const trailGeometry = new THREE.BufferGeometry();
+            const trailMaterial = new THREE.LineBasicMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.8,
+                linewidth: 3
+            });
+            const trail = new THREE.Line(trailGeometry, trailMaterial);
+            scene.add(trail);
+
+            const trailPositions = [];
+            const maxTrailLength = 150; // Longer trail
+
+            scene.add(mesh);
+
+            satellites.push({
+                mesh,
+                velocity: velocity.clone(),
+                trail,
+                trailPositions,
+                maxTrailLength,
+                size,
+                isGeosync: true,
+                ring // Store ring reference
+            });
+
+            updateCount();
+        }
+
+        addButton.addEventListener('click', () => {
+            // Enter launch mode
+            launchMode = true;
+            document.getElementById('launchMode').classList.add('active');
+            canvas.style.cursor = 'crosshair';
+        });
+
+        // Toggle 3D guides button
+        const toggleGuidesButton = document.getElementById('toggleGuides');
+        let guidesVisible = true;
+        toggleGuidesButton.addEventListener('click', () => {
+            guidesVisible = !guidesVisible;
+            
+            gridHelper.visible = guidesVisible;
+            orbitRing.visible = guidesVisible;
+            xAxis.visible = guidesVisible;
+            yAxis.visible = guidesVisible;
+            zAxis.visible = guidesVisible;
+            
+            toggleGuidesButton.textContent = guidesVisible ? 'Hide 3D Guides' : 'Show 3D Guides';
+        });
+
+        // Geosynchronous satellite button
+        const geoSyncButton = document.getElementById('addGeoSync');
+        geoSyncButton.addEventListener('click', () => {
+            // Calculate geosynchronous orbit parameters
+            // For a geosynchronous orbit, orbital period = planet rotation period
+            // Using T = 2π√(r³/GM), we can solve for r
+            // Assuming planet rotates once per 100 time units in our simulation
+            
+            const planetRotationPeriod = 100; // Arbitrary units matching our simulation
+            const orbitalRadius = Math.pow((G * planetMass * planetRotationPeriod * planetRotationPeriod) / (4 * Math.PI * Math.PI), 1/3);
+            
+            // Random orbital inclination (angle from equatorial plane)
+            const inclination = (Math.random() - 0.5) * Math.PI * 0.6; // Up to ±54 degrees
+            
+            // Random starting angle in the orbital plane
+            const angle = Math.random() * Math.PI * 2;
+            
+            // Random rotation of the orbital plane
+            const planeRotation = Math.random() * Math.PI * 2;
+            
+            // Calculate position with inclination
+            const x = Math.cos(angle) * orbitalRadius;
+            const y = Math.sin(angle) * orbitalRadius * Math.sin(inclination);
+            const z = Math.sin(angle) * orbitalRadius * Math.cos(inclination);
+            
+            // Rotate the position around Y axis for plane rotation
+            const position = new THREE.Vector3(
+                x * Math.cos(planeRotation) - z * Math.sin(planeRotation),
+                y,
+                x * Math.sin(planeRotation) + z * Math.cos(planeRotation)
+            );
+            
+            // Calculate perfect circular orbital velocity
+            const orbitalSpeed = Math.sqrt((G * planetMass) / orbitalRadius);
+            
+            // Velocity vector perpendicular to position (tangent to orbit)
+            // This ensures circular orbit regardless of inclination
+            const posNorm = position.clone().normalize();
+            
+            // Create a perpendicular vector in the orbital plane
+            // Use cross product with a reference vector
+            let refVector = new THREE.Vector3(0, 1, 0);
+            // If position is too close to vertical, use different reference
+            if (Math.abs(posNorm.y) > 0.9) {
+                refVector = new THREE.Vector3(1, 0, 0);
+            }
+            
+            const tangent = new THREE.Vector3().crossVectors(posNorm, refVector).normalize();
+            const velocity = tangent.multiplyScalar(orbitalSpeed);
+            
+            // Add some random variation to make each orbit unique while keeping it stable
+            const randomTilt = (Math.random() - 0.5) * 0.1;
+            velocity.y += orbitalSpeed * randomTilt;
+            
+            // Make geosync satellites bigger and use box geometry
+            const geoSyncSize = 12; // Much larger than regular satellites
+            createGeosyncSatellite(position, velocity, geoSyncSize, '#38ef7d');
+        });
+
+        clearButton.addEventListener('click', () => {
+            satellites.forEach(sat => {
+                scene.remove(sat.mesh);
+                scene.remove(sat.trail);
+            });
+            satellites.length = 0;
+
+            // Also cancel launch mode if active
+            if (launchMode) {
+                if (previewSatellite) {
+                    scene.remove(previewSatellite);
+                    previewSatellite = null;
+                }
+                velocityArrow.group.visible = false;
+                predictedOrbitLine.visible = false;
+                apoapsisMarker.visible = false;
+                periapsisMarker.visible = false;
+                launchStartPos = null;
+                launchCurrentPos = null;
+                launchMode = false;
+                document.getElementById('launchMode').classList.remove('active');
+                canvas.style.cursor = 'grab';
+            }
+
+            updateCount();
+        });
+
+        function updateCount() {
+            document.getElementById('count').textContent = satellites.length;
+        }
+
+        // Mouse controls
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let cameraAngle = { theta: 0, phi: 0 };
+        let cameraDistance = 500;
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function getMousePosition(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        function get3DPointOnPlanet(event) {
+            getMousePosition(event);
+            raycaster.setFromCamera(mouse, camera);
+            
+            const intersects = raycaster.intersectObject(planet);
+            if (intersects.length > 0) {
+                return intersects[0].point;
+            }
+            return null;
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+            
+            if (launchMode && e.button === 0) { // Left click in launch mode
+                e.preventDefault();
+                
+                // Use raycasting to find a point in 3D space where user clicked
+                getMousePosition(e);
+                raycaster.setFromCamera(mouse, camera);
+                
+                // Try to intersect with planet first
+                const planetIntersects = raycaster.intersectObject(planet);
+                
+                if (planetIntersects.length > 0) {
+                    // Clicked on planet - spawn satellite slightly above surface
+                    const surfacePoint = planetIntersects[0].point;
+                    const normal = surfacePoint.clone().normalize();
+                    launchStartPos = surfacePoint.add(normal.multiplyScalar(10)); // 10 units above surface
+                } else {
+                    // Clicked in empty space - create point at orbital height
+                    // Cast ray and find point at desired orbital distance
+                    const height = parseFloat(heightSlider.value) + planetRadius;
+                    const ray = raycaster.ray;
+                    
+                    // Find the point along the ray that is closest to being at orbital height
+                    // We want point where |point| = height
+                    // Ray equation: P(t) = origin + t * direction
+                    // We need to solve: |origin + t * direction|² = height²
+                    
+                    const origin = ray.origin;
+                    const dir = ray.direction;
+                    
+                    // Quadratic formula: a*t² + b*t + c = 0
+                    const a = dir.dot(dir);
+                    const b = 2 * origin.dot(dir);
+                    const c = origin.dot(origin) - height * height;
+                    
+                    const discriminant = b * b - 4 * a * c;
+                    
+                    if (discriminant >= 0) {
+                        // Take the closer intersection point
+                        const t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
+                        const t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
+                        const t = t1 > 0 ? t1 : t2;
+                        
+                        launchStartPos = origin.clone().add(dir.clone().multiplyScalar(t));
+                    } else {
+                        // Fallback: use point along ray at fixed distance
+                        launchStartPos = origin.clone().add(dir.clone().multiplyScalar(height));
+                    }
+                }
+                
+                isDragging = true;
+                launchCurrentPos = launchStartPos.clone();
+                
+                // Create preview satellite at the actual click point
+                const size = parseFloat(sizeSlider.value);
+                previewSatellite = createSatelliteModel(size, selectedColor);
+                previewSatellite.position.copy(launchStartPos);
+                previewSatellite.traverse((child) => {
+                    if (child.material) {
+                        child.material = child.material.clone();
+                        child.material.transparent = true;
+                        child.material.opacity = 0.7;
+                    }
+                });
+                scene.add(previewSatellite);
+            } else if (!launchMode && (e.button === 0 || e.button === 2)) { // Left or right click when not in launch mode
+                isDragging = true;
+                e.preventDefault(); // Prevent context menu on right click
+            }
+        });
+
+        // Prevent context menu on right click
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (launchMode && launchStartPos && isDragging) {
+                e.preventDefault();
+                
+                const deltaX = (e.clientX - previousMousePosition.x);
+                const deltaY = (e.clientY - previousMousePosition.y);
+                
+                // Convert screen delta to 3D offset relative to camera
+                const right = new THREE.Vector3();
+                const up = new THREE.Vector3();
+                camera.matrix.extractBasis(right, up, new THREE.Vector3());
+                
+                launchCurrentPos = launchStartPos.clone()
+                    .add(right.multiplyScalar(deltaX * 0.5))
+                    .add(up.multiplyScalar(-deltaY * 0.5));
+                
+                // Calculate and display velocity vector
+                const velocityVector = launchCurrentPos.clone().sub(launchStartPos);
+                const length = velocityVector.length();
+
+                if (length > 0.5) {
+                    velocityArrow.group.visible = true;
+
+                    // Update arrow colors
+                    velocityArrow.material.color.set(selectedColor);
+                    velocityArrow.headMaterial.color.set(selectedColor);
+                    velocityArrow.tipMaterial.color.set(selectedColor);
+
+                    // Position arrow at satellite
+                    velocityArrow.group.position.copy(launchStartPos);
+
+                    // Scale shaft based on vector length
+                    const arrowLength = Math.min(length * 2, 100);
+                    velocityArrow.shaft.scale.y = arrowLength;
+                    velocityArrow.shaft.position.y = arrowLength / 2;
+
+                    // Position head at end
+                    velocityArrow.head.position.y = arrowLength;
+
+                    // Position tip sphere at the very end
+                    velocityArrow.tip.position.y = arrowLength + 4;
+
+                    // Pulse the tip sphere based on velocity magnitude
+                    const pulseScale = 1 + Math.sin(Date.now() * 0.01) * 0.3;
+                    velocityArrow.tip.scale.set(pulseScale, pulseScale, pulseScale);
+
+                    // Orient arrow in direction of velocity
+                    const direction = velocityVector.clone().normalize();
+                    const axis = new THREE.Vector3(0, 1, 0);
+                    const quaternion = new THREE.Quaternion().setFromUnitVectors(axis, direction);
+                    velocityArrow.group.setRotationFromQuaternion(quaternion);
+
+                    // Calculate and display predicted orbit
+                    const velocity = velocityVector.clone().multiplyScalar(2); // Same scale factor as launch
+                    const orbitPoints = generateOrbitPoints(launchStartPos, velocity);
+
+                    // Update orbit line
+                    const positions = new Float32Array(orbitPoints.length * 3);
+                    orbitPoints.forEach((point, i) => {
+                        positions[i * 3] = point.x;
+                        positions[i * 3 + 1] = point.y;
+                        positions[i * 3 + 2] = point.z;
+                    });
+
+                    predictedOrbitLine.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                    predictedOrbitLine.geometry.attributes.position.needsUpdate = true;
+                    predictedOrbitLine.material.color.set(selectedColor);
+                    predictedOrbitLine.visible = true;
+
+                    // Calculate and show apoapsis/periapsis
+                    const orbit = calculateOrbitFromState(launchStartPos, velocity);
+
+                    if (orbit.eccentricity < 1.0 && orbit.semiMajorAxis > 0) {
+                        // Valid elliptical orbit
+                        const eVecNorm = orbit.eccentricityVector.clone().normalize();
+
+                        // Apoapsis (furthest point) - opposite direction of eccentricity vector
+                        const apPosition = eVecNorm.clone().multiplyScalar(-orbit.apoapsis);
+                        apoapsisMarker.position.copy(apPosition);
+                        apoapsisMarker.visible = orbit.apoapsis > planetRadius;
+
+                        // Periapsis (closest point) - direction of eccentricity vector
+                        const pePosition = eVecNorm.clone().multiplyScalar(-orbit.periapsis);
+                        periapsisMarker.position.copy(pePosition);
+                        periapsisMarker.visible = orbit.periapsis > planetRadius;
+                    } else {
+                        // Not a closed orbit
+                        apoapsisMarker.visible = false;
+                        periapsisMarker.visible = false;
+                    }
+                } else {
+                    predictedOrbitLine.visible = false;
+                    apoapsisMarker.visible = false;
+                    periapsisMarker.visible = false;
+                }
+            } else if (isDragging && !launchMode) {
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+
+                cameraAngle.theta += deltaX * 0.005;
+                cameraAngle.phi += deltaY * 0.005;
+                cameraAngle.phi = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, cameraAngle.phi));
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (launchMode && launchStartPos && launchCurrentPos && isDragging && e.button === 0) {
+                e.preventDefault();
+                
+                // Calculate final velocity
+                const velocityVector = launchCurrentPos.clone().sub(launchStartPos);
+                
+                if (velocityVector.length() > 0.5) {
+                    const velocity = velocityVector.multiplyScalar(2); // Scale factor for velocity
+                    
+                    // Create satellite with this velocity
+                    const size = parseFloat(sizeSlider.value);
+                    createSatellite(launchStartPos, velocity, size, selectedColor);
+                }
+                
+                // Clean up
+                if (previewSatellite) {
+                    scene.remove(previewSatellite);
+                    previewSatellite = null;
+                }
+                velocityArrow.group.visible = false;
+                predictedOrbitLine.visible = false;
+                apoapsisMarker.visible = false;
+                periapsisMarker.visible = false;
+                launchStartPos = null;
+                launchCurrentPos = null;
+                isDragging = false;
+
+                // Exit launch mode
+                launchMode = false;
+                document.getElementById('launchMode').classList.remove('active');
+                canvas.style.cursor = 'grab';
+            } else {
+                isDragging = false;
+            }
+        });
+
+        // ESC key to cancel launch mode
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && launchMode) {
+                // Cancel launch mode
+                if (previewSatellite) {
+                    scene.remove(previewSatellite);
+                    previewSatellite = null;
+                }
+                velocityArrow.group.visible = false;
+                predictedOrbitLine.visible = false;
+                apoapsisMarker.visible = false;
+                periapsisMarker.visible = false;
+                launchStartPos = null;
+                launchCurrentPos = null;
+                launchMode = false;
+                document.getElementById('launchMode').classList.remove('active');
+                canvas.style.cursor = 'grab';
+            }
+        });
+
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            cameraDistance += e.deltaY * 0.5;
+            cameraDistance = Math.max(150, Math.min(1000, cameraDistance));
+        });
+
+        // Animation loop
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01 * simulationSpeed;
+
+            // Update planet shader
+            planetMaterial.uniforms.time.value = time;
+            cloudMaterial.uniforms.time.value = time;
+
+            // Rotate planet slowly
+            planet.rotation.y += 0.001 * simulationSpeed;
+            
+            // Rotate clouds slightly faster for parallax effect
+            clouds.rotation.y += 0.0015 * simulationSpeed;
+            
+            atmosphere.rotation.y += 0.001 * simulationSpeed;
+
+            // Update camera position
+            camera.position.x = cameraDistance * Math.sin(cameraAngle.theta) * Math.cos(cameraAngle.phi);
+            camera.position.y = cameraDistance * Math.sin(cameraAngle.phi);
+            camera.position.z = cameraDistance * Math.cos(cameraAngle.theta) * Math.cos(cameraAngle.phi);
+            camera.lookAt(0, 0, 0);
+
+            // Update satellites
+            const dt = 0.016 * simulationSpeed; // Apply simulation speed to time delta
+            satellites.forEach((sat, index) => {
+                const position = sat.mesh.position;
+                const distance = position.length();
+
+                // Check collision with planet
+                if (distance < planetRadius + sat.size) {
+                    // DRAMATIC EXPLOSION!
+                    const impactColor = sat.mesh.material.color;
+                    
+                    // Create explosion particles
+                    const explosion = new ExplosionParticle(position.clone(), impactColor);
+                    explosions.push(explosion);
+                    
+                    // Create shockwave
+                    const shockwave = createShockwave(position.clone(), impactColor);
+                    explosions.push(shockwave);
+                    
+                    // Camera shake based on satellite size
+                    triggerCameraShake(sat.size * 0.5, 20);
+                    
+                    // Screen flash
+                    createFlash(`rgba(${parseInt(impactColor.getHexString().slice(0,2), 16)}, ${parseInt(impactColor.getHexString().slice(2,4), 16)}, ${parseInt(impactColor.getHexString().slice(4,6), 16)}, 0.3)`);
+                    
+                    // Add temporary bright light at impact
+                    const impactLight = new THREE.PointLight(impactColor, 3, 300);
+                    impactLight.position.copy(position);
+                    scene.add(impactLight);
+                    setTimeout(() => scene.remove(impactLight), 200);
+                    
+                    // Clean up satellite
+                    scene.remove(sat.mesh);
+                    scene.remove(sat.trail);
+                    satellites.splice(index, 1);
+                    updateCount();
+                    return;
+                }
+
+                // Calculate gravitational force
+                const direction = position.clone().normalize();
+                const forceMagnitude = (G * planetMass) / (distance * distance);
+                const force = direction.multiplyScalar(-forceMagnitude);
+
+                // Update velocity and position
+                sat.velocity.add(force.multiplyScalar(dt));
+                sat.mesh.position.add(sat.velocity.clone().multiplyScalar(dt));
+
+                // Update trail
+                sat.trailPositions.push(sat.mesh.position.clone());
+                if (sat.trailPositions.length > sat.maxTrailLength) {
+                    sat.trailPositions.shift();
+                }
+
+                const positions = new Float32Array(sat.trailPositions.length * 3);
+                sat.trailPositions.forEach((pos, i) => {
+                    positions[i * 3] = pos.x;
+                    positions[i * 3 + 1] = pos.y;
+                    positions[i * 3 + 2] = pos.z;
+                });
+
+                sat.trail.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                sat.trail.geometry.attributes.position.needsUpdate = true;
+
+                // Rotate satellite body slowly
+                sat.mesh.rotation.y += 0.01 * simulationSpeed;
+
+                // Animate satellite components
+                if (sat.mesh.userData) {
+                    // Pulse communication light
+                    if (sat.mesh.userData.light) {
+                        const pulse = Math.sin(time * 5 + sat.mesh.position.x) * 0.3 + 0.7;
+                        sat.mesh.userData.light.material.opacity = pulse;
+                    }
+
+                    // Gently oscillate dish
+                    if (sat.mesh.userData.dish) {
+                        sat.mesh.userData.dish.rotation.x = Math.PI / 6 + Math.sin(time * 0.5) * 0.1;
+                    }
+                }
+
+                // Rotate ring for geosync satellites
+                if (sat.isGeosync && sat.ring) {
+                    sat.ring.rotation.x += 0.01 * simulationSpeed;
+                    sat.ring.rotation.y += 0.02 * simulationSpeed;
+                }
+            });
+
+            // Update explosions
+            for (let i = explosions.length - 1; i >= 0; i--) {
+                if (explosions[i].update()) {
+                    explosions[i].cleanup();
+                    explosions.splice(i, 1);
+                }
+            }
+
+            // Update camera shake
+            updateCameraShake();
+
+            // Slowly rotate stars
+            stars.rotation.y += 0.0001 * simulationSpeed;
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+
+        // Add a couple of starting satellites with circular orbits
+        const pos1 = new THREE.Vector3(150, 0, 0);
+        const vel1 = new THREE.Vector3(0, 0, Math.sqrt((G * planetMass) / 150));
+        createSatellite(pos1, vel1, 4, '#6eb5ff');
+
+        const pos2 = new THREE.Vector3(0, 0, 200);
+        const vel2 = new THREE.Vector3(Math.sqrt((G * planetMass) / 200), 0, 0);
+        createSatellite(pos2, vel2, 6, '#ff6eb5');
+    </script>
+</body>
+</html>
