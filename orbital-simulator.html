@@ -592,6 +592,7 @@
         <button id="addGeoSync" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);">Launch Geosynchronous</button>
         <button id="toggleGuides" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">Hide 3D Guides</button>
         <button id="showMissionsBtn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4); display: none;">Show Missions</button>
+        <button id="toggleMoon" style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%); box-shadow: 0 4px 15px rgba(253, 203, 110, 0.4);">Add Moon 🌙</button>
         <button class="clear-btn" id="clearAll">Clear All Satellites</button>
     </div>
 
@@ -1053,6 +1054,75 @@
         const explosions = [];
         const G = 100; // Gravitational constant (scaled for visualization)
         const planetMass = 1000;
+
+        // Moon parameters
+        const moonMass = 400; // 0.4 × planet mass
+        const moonDistance = 2000; // Distance from planet
+        const moonRadius = 35; // Visual size (larger so it's visible at distance)
+        let moonEnabled = false;
+        let moonPosition = new THREE.Vector3(moonDistance, 0, 0);
+        let moonVelocity = new THREE.Vector3(0, 0, Math.sqrt((G * planetMass) / moonDistance));
+
+        // Create moon
+        const moonGeometry = new THREE.SphereGeometry(moonRadius, 64, 64);
+        const moonMaterial = new THREE.MeshStandardMaterial({
+            color: 0xaaaaaa,
+            roughness: 0.9,
+            metalness: 0.1,
+            emissive: 0x444444,
+            emissiveIntensity: 0.3
+        });
+        const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+        moon.position.copy(moonPosition);
+        moon.visible = false; // Hidden by default
+        scene.add(moon);
+
+        // Moon label (to help locate it)
+        const moonLabelCanvas = document.createElement('canvas');
+        moonLabelCanvas.width = 128;
+        moonLabelCanvas.height = 64;
+        const moonLabelCtx = moonLabelCanvas.getContext('2d');
+        moonLabelCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        moonLabelCtx.font = 'bold 32px Arial';
+        moonLabelCtx.textAlign = 'center';
+        moonLabelCtx.fillText('🌙', 64, 45);
+        const moonLabelTexture = new THREE.CanvasTexture(moonLabelCanvas);
+        const moonLabelMaterial = new THREE.SpriteMaterial({
+            map: moonLabelTexture,
+            transparent: true
+        });
+        const moonLabel = new THREE.Sprite(moonLabelMaterial);
+        moonLabel.scale.set(100, 50, 1);
+        moonLabel.position.set(0, moonRadius + 60, 0);
+        moonLabel.visible = false;
+        moon.add(moonLabel);
+
+        // Moon orbit trail
+        const moonTrailGeometry = new THREE.BufferGeometry();
+        const moonTrailMaterial = new THREE.LineBasicMaterial({
+            color: 0x888888,
+            transparent: true,
+            opacity: 0.3,
+            linewidth: 1
+        });
+        const moonTrail = new THREE.Line(moonTrailGeometry, moonTrailMaterial);
+        const moonTrailPositions = [];
+        const maxMoonTrailLength = 200;
+        moonTrail.visible = false;
+        scene.add(moonTrail);
+
+        // Moon orbit reference ring (shows the orbital path)
+        const moonOrbitRingGeometry = new THREE.RingGeometry(moonDistance - 5, moonDistance + 5, 128);
+        const moonOrbitRingMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffaa00,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.2
+        });
+        const moonOrbitRing = new THREE.Mesh(moonOrbitRingGeometry, moonOrbitRingMaterial);
+        moonOrbitRing.rotation.x = Math.PI / 2; // Rotate to horizontal plane
+        moonOrbitRing.visible = false;
+        scene.add(moonOrbitRing);
 
         // Selected color and type
         let selectedColor = '#6eb5ff';
@@ -2160,14 +2230,39 @@
         let guidesVisible = true;
         toggleGuidesButton.addEventListener('click', () => {
             guidesVisible = !guidesVisible;
-            
+
             gridHelper.visible = guidesVisible;
             orbitRing.visible = guidesVisible;
             xAxis.visible = guidesVisible;
             yAxis.visible = guidesVisible;
             zAxis.visible = guidesVisible;
-            
+
             toggleGuidesButton.textContent = guidesVisible ? 'Hide 3D Guides' : 'Show 3D Guides';
+        });
+
+        // Toggle moon button
+        const toggleMoonButton = document.getElementById('toggleMoon');
+        toggleMoonButton.addEventListener('click', () => {
+            moonEnabled = !moonEnabled;
+            moon.visible = moonEnabled;
+            moonTrail.visible = moonEnabled;
+            moonLabel.visible = moonEnabled;
+            moonOrbitRing.visible = moonEnabled;
+
+            toggleMoonButton.textContent = moonEnabled ? 'Remove Moon 🌑' : 'Add Moon 🌙';
+
+            // Reset moon position and velocity when enabling
+            if (moonEnabled) {
+                moonPosition.set(moonDistance, 0, 0);
+                moonVelocity.set(0, 0, Math.sqrt((G * planetMass) / moonDistance));
+                moonTrailPositions.length = 0; // Clear trail
+                moon.position.copy(moonPosition);
+
+                // Zoom camera out to see the full moon orbit
+                if (cameraDistance < 4000) {
+                    cameraDistance = 4000;
+                }
+            }
         });
 
         // Geosynchronous satellite button
@@ -2658,7 +2753,7 @@
         canvas.addEventListener('wheel', (e) => {
             e.preventDefault();
             cameraDistance += e.deltaY * 0.5;
-            cameraDistance = Math.max(150, Math.min(1000, cameraDistance));
+            cameraDistance = Math.max(150, Math.min(5000, cameraDistance));
         });
 
         // Simulation update function (extracted for pause/step control)
@@ -2726,10 +2821,22 @@
                     return;
                 }
 
-                // Calculate gravitational force
+                // Calculate gravitational force from planet
                 const directionVec = position.clone().normalize();
                 const forceMagnitude = (G * planetMass) / (distance * distance);
                 const force = directionVec.multiplyScalar(-forceMagnitude);
+
+                // Add gravitational force from moon (if enabled)
+                if (moonEnabled) {
+                    const moonToSat = position.clone().sub(moonPosition);
+                    const moonDistance = moonToSat.length();
+                    if (moonDistance > 0.1) { // Avoid singularity
+                        const moonDirection = moonToSat.normalize();
+                        const moonForceMagnitude = (G * moonMass) / (moonDistance * moonDistance);
+                        const moonForce = moonDirection.multiplyScalar(-moonForceMagnitude);
+                        force.add(moonForce);
+                    }
+                }
 
                 // Update velocity and position
                 sat.velocity.add(force.multiplyScalar(dt));
@@ -2775,6 +2882,39 @@
                     }
                 }
             });
+
+            // Update moon orbit (if enabled)
+            if (moonEnabled) {
+                // Moon orbits the planet
+                const moonDist = moonPosition.length();
+                const moonDir = moonPosition.clone().normalize();
+                const moonForceMag = (G * planetMass) / (moonDist * moonDist);
+                const moonForce = moonDir.multiplyScalar(-moonForceMag);
+
+                // Update moon velocity and position
+                moonVelocity.add(moonForce.multiplyScalar(dt));
+                moonPosition.add(moonVelocity.clone().multiplyScalar(dt));
+                moon.position.copy(moonPosition);
+
+                // Update moon trail
+                moonTrailPositions.push(moonPosition.clone());
+                if (moonTrailPositions.length > maxMoonTrailLength) {
+                    moonTrailPositions.shift();
+                }
+
+                const moonPositions = new Float32Array(moonTrailPositions.length * 3);
+                moonTrailPositions.forEach((pos, i) => {
+                    moonPositions[i * 3] = pos.x;
+                    moonPositions[i * 3 + 1] = pos.y;
+                    moonPositions[i * 3 + 2] = pos.z;
+                });
+
+                moonTrail.geometry.setAttribute('position', new THREE.BufferAttribute(moonPositions, 3));
+                moonTrail.geometry.attributes.position.needsUpdate = true;
+
+                // Rotate moon slowly
+                moon.rotation.y += 0.005 * simulationSpeed * direction;
+            }
 
             // Update explosions
             for (let i = explosions.length - 1; i >= 0; i--) {
